@@ -1,0 +1,86 @@
+{
+  "name": "configure-3scale-amp",
+  "id": "serviceUUID",
+  "description": "3scale AMP backend server configuration",
+  "requires": [
+    "route_forwarding"
+  ],
+  "bindable": false,
+  "metadata": {
+    "displayName": "configure-3scale-amp",
+    "documentationUrl": "https://access.qa.redhat.com/documentation/en-us/reference_architectures/2017/html/api_management_with_red_hat_3scale_api_management_platform",
+    "longDescription": "A broker configures where the 3scale-AMP backend server parameters",
+    "parameters": []
+  },
+  "plans": [
+    {
+      "id": "configure-3scale-amp-plan",
+      "name": "configure-3scale-amp",
+      "description": "Configuration to 3scale API Management Platform",
+      "free": true,
+      "schemas": {
+        "service_instance": {
+          "create": {
+            "parameters": {
+              "$schema": "http://json-schema.org/draft-04/schema",
+              "additionalProperties": false,
+              "properties": {
+                "configuration_name": {
+                  "default": "",
+                  "title": "unique name for this configuration",
+                  "type": "string"
+                },
+                "access_token": {
+                  "default": "34bbf459e196ac29e20aac4eace64f83445e7ea5f0c129f6d91e67d5666388c3",
+                  "title": "3scale access token",
+                  "type": "string"
+                },
+                "amp_address": {
+                  "title": "3scale AMP admin Address",
+                  "type": "string",
+                  "default": "amp-admin"
+                }
+              },
+              "required": [
+                "configuration_name",
+                "access_token",
+                "amp_address"
+              ],
+              "type": "object"
+            }
+          },
+          "update": {
+            "parameters": {
+              "$schema": "http://json-schema.org/draft-04/schema",
+              "additionalProperties": false,
+              "properties": {
+                "configuration_name": {
+                  "default": "",
+                  "title": "unique name for this configuration",
+                  "type": "string"
+                },
+                "access_token": {
+                  "default": "Basic",
+                  "title": "3scale access token",
+                  "type": "string"
+                },
+                "amp_address": {
+                  "title": "3scale AMP admin Address",
+                  "type": "string",
+                  "default": ""
+                }
+              },
+              "required": [
+                "configuration_name",
+                "access_token",
+                "amp_address"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "service_binding": {}
+      }
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+apiVersion: servicecatalog.k8s.io/v1alpha1
+kind: Broker
+metadata:
+  name: 3scale-broker
+spec:
+  url: http://three-scale.3scale-broker-poc.svc.cluster.local:8080

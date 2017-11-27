@@ -1,0 +1,7 @@
+swarm:
+  logging:
+    loggers:
+      org:
+        level: INFO
+      com.redhat.syseng:
+        level: DEBUG

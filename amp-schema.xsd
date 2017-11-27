@@ -1,0 +1,143 @@
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element type="services" name="services"/>
+  <xs:element type="plans" name="plans"/>
+  <xs:element type="mapping_rules" name="mapping_rules"/>
+  <xs:element type="proxy" name="proxy"/>
+  <xs:element name="applications" type="applications"/>
+  <xs:element name="users" type="users"/>
+  <xs:complexType name="metric">
+    <xs:sequence>
+      <xs:element type="xs:byte" name="id"/>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element type="xs:string" name="system_name"/>
+      <xs:element type="xs:string" name="friendly_name"/>
+      <xs:element type="xs:byte" name="service_id"/>
+      <xs:element type="xs:string" name="unit"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="metrics">
+    <xs:sequence>
+      <xs:element type="metric" name="metric" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="service">
+    <xs:sequence>
+      <xs:element type="xs:byte" name="id"/>
+      <xs:element type="xs:byte" name="account_id"/>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element type="xs:string" name="state"/>
+      <xs:element type="xs:string" name="system_name"/>
+      <xs:element type="xs:string" name="end_user_registration_required"/>
+      <xs:element type="metrics" name="metrics"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="services">
+    <xs:sequence>
+      <xs:element type="service" name="service" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="plan">
+    <xs:sequence>
+      <xs:element type="xs:byte" name="id"/>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element type="xs:string" name="type"/>
+      <xs:element type="xs:string" name="state"/>
+      <xs:element type="xs:byte" name="service_id"/>
+      <xs:element type="xs:string" name="end_user_required"/>
+      <xs:element type="xs:float" name="setup_fee"/>
+      <xs:element type="xs:float" name="cost_per_month"/>
+      <xs:element type="xs:string" name="trial_period_days"/>
+      <xs:element type="xs:byte" name="cancellation_period"/>
+    </xs:sequence>
+    <xs:attribute type="xs:string" name="custom" use="optional"/>
+    <xs:attribute type="xs:string" name="default" use="optional"/>
+  </xs:complexType>
+  <xs:complexType name="plans">
+    <xs:sequence>
+      <xs:element type="plan" name="plan" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="mapping_rule">
+    <xs:sequence>
+      <xs:element type="xs:short" name="id"/>
+      <xs:element type="xs:byte" name="metric_id"/>
+      <xs:element type="xs:string" name="pattern"/>
+      <xs:element type="xs:string" name="http_method"/>
+      <xs:element type="xs:byte" name="delta"/>
+      <xs:element type="xs:string" name="created_at"/>
+      <xs:element type="xs:string" name="updated_at"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="mapping_rules">
+    <xs:sequence>
+      <xs:element type="mapping_rule" name="mapping_rule" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="proxy">
+    <xs:sequence>
+      <xs:element type="xs:byte" name="service_id"/>
+      <xs:element type="xs:string" name="endpoint"/>
+      <xs:element type="xs:string" name="api_backend"/>
+      <xs:element type="xs:string" name="credentials_location"/>
+      <xs:element type="xs:string" name="auth_app_key"/>
+      <xs:element type="xs:string" name="auth_app_id"/>
+      <xs:element type="xs:string" name="auth_user_key"/>
+      <xs:element type="xs:string" name="error_auth_failed"/>
+      <xs:element type="xs:string" name="error_auth_missing"/>
+      <xs:element type="xs:short" name="error_status_auth_failed"/>
+      <xs:element type="xs:string" name="error_headers_auth_failed"/>
+      <xs:element type="xs:short" name="error_status_auth_missing"/>
+      <xs:element type="xs:string" name="error_headers_auth_missing"/>
+      <xs:element type="xs:string" name="error_no_match"/>
+      <xs:element type="xs:short" name="error_status_no_match"/>
+      <xs:element type="xs:string" name="error_headers_no_match"/>
+      <xs:element type="xs:string" name="secret_token"/>
+      <xs:element type="xs:string" name="sandbox_endpoint"/>
+      <xs:element type="xs:string" name="api_test_path"/>
+      <xs:element type="xs:string" name="created_at"/>
+      <xs:element type="xs:string" name="updated_at"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="application">
+    <xs:sequence>
+      <xs:element type="xs:short" name="id"/>
+      <xs:element type="xs:dateTime" name="created_at"/>
+      <xs:element type="xs:dateTime" name="updated_at"/>
+      <xs:element type="xs:string" name="state"/>
+      <xs:element type="xs:byte" name="user_account_id"/>
+      <xs:element type="xs:string" name="end_user_required"/>
+      <xs:element type="xs:byte" name="service_id"/>
+      <xs:element type="xs:string" name="user_key"/>
+      <xs:element type="xs:string" name="provider_verification_key"/>
+      <xs:element type="plan" name="plan"/>
+      <xs:element type="xs:string" name="name"/>
+      <xs:element type="xs:string" name="description"/>
+      <xs:element type="xs:string" name="extra_fields"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="applications">
+    <xs:sequence>
+      <xs:element type="application" name="application" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="user">
+    <xs:sequence>
+      <xs:element type="xs:byte" name="id"/>
+      <xs:element type="xs:dateTime" name="created_at"/>
+      <xs:element type="xs:dateTime" name="updated_at"/>
+      <xs:element type="xs:byte" name="account_id"/>
+      <xs:element type="xs:string" name="state"/>
+      <xs:element type="xs:string" name="role"/>
+      <xs:element type="xs:string" name="username"/>
+      <xs:element type="xs:string" name="email"/>
+      <xs:element type="xs:string" name="extra_fields"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="users">
+    <xs:sequence>
+      <xs:element type="user" name="user" maxOccurs="unbounded" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>

@@ -1,0 +1,155 @@
+{
+  "name": "secure-service-3scale",
+  "id": "serviceUUID",
+  "description": "secure service 3scales broker implementation",
+  "requires": [
+    "route_forwarding"
+  ],
+  "bindable": true,
+  "metadata": {
+    "displayName": "secure-service-3scale",
+    "documentationUrl": "https://access.qa.redhat.com/documentation/en-us/reference_architectures/2017/html/api_management_with_red_hat_3scale_api_management_platform",
+    "longDescription": "A broker that secures input URL through 3scales-AMP",
+    "parameters": [
+      {
+        "input_url": {
+          "title": "input url",
+          "type": "string",
+          "default": "https://echo-api.3scale.net:443"
+        }
+      },
+      {
+        "username": {
+          "title": "User Name",
+          "type": "string",
+          "default": "admin"
+        }
+      },
+      {
+        "password": {
+          "title": "password",
+          "type": "string"
+        }
+      }
+    ]
+  },
+  "plans": [
+    {
+      "id": "3scale-service-plan",
+      "name": "3scale-Service-Publishing",
+      "description": "Publish API to 3scale API Management Platform",
+      "free": true,
+      "schemas": {
+        "service_instance": {
+          "create": {
+            "parameters": {
+              "$schema": "http://json-schema.org/draft-04/schema",
+              "additionalProperties": false,
+              "properties": {
+                "service_name": {
+                  "default": "",
+                  "title": "Service display name",
+                  "type": "string"
+                },
+                "application_plan": {
+                  "default": "Basic",
+                  "title": "3scale Application Plan",
+                  "type": "string"
+                },
+                "input_url": {
+                  "title": "Service Address",
+                  "type": "string",
+                  "default": ""
+                },
+                "application_name": {
+                  "default": "",
+                  "title": "3scale Application Name",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "service_name",
+                "application_plan",
+                "input_url",
+                "application_name"
+              ],
+              "type": "object"
+            }
+          },
+          "update": {
+            "parameters": {
+              "$schema": "http://json-schema.org/draft-04/schema",
+              "additionalProperties": false,
+              "properties": {
+                "service_name": {
+                  "default": "",
+                  "title": "Service display name",
+                  "type": "string"
+                },
+                "application_plan": {
+                  "default": "Basic",
+                  "title": "3scale Application Plan",
+                  "type": "string"
+                },
+                "input_url": {
+                  "title": "Service Address",
+                  "type": "string",
+                  "default": ""
+                },
+                "application_name": {
+                  "default": "",
+                  "title": "3scale Application Name",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "service_name",
+                "application_plan",
+                "input_url",
+                "application_name"
+              ],
+              "type": "object"
+            }
+          }
+        },
+        "service_binding": {
+          "create": {
+            "parameters": {
+              "$schema": "http://json-schema.org/draft-04/schema",
+              "additionalProperties": false,
+              "properties": {
+                "service_name": {
+                  "default": "",
+                  "title": "Service display name",
+                  "type": "string"
+                },
+                "application_plan": {
+                  "default": "Basic",
+                  "title": "3scale Application Plan",
+                  "type": "string"
+                },
+                "input_url": {
+                  "title": "Service Address",
+                  "type": "string",
+                  "default": ""
+                },
+                "application_name": {
+                  "default": "",
+                  "title": "3scale Application Name",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "service_name",
+                "application_plan",
+                "input_url",
+                "application_name"
+              ],
+              "type": "object"
+            }
+          }
+        }
+      }
+    }
+  ]
+}

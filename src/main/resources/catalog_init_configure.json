@@ -39,12 +39,18 @@
                   "title": "3scale AMP admin Address",
                   "type": "string",
                   "default": "amp-admin"
+                },
+                "account_id": {
+                  "title": "3scale AMP account group id",
+                  "type": "string",
+                  "default": "5"
                 }
               },
               "required": [
                 "configuration_name",
                 "access_token",
-                "amp_address"
+                "amp_address",
+                "account_id"
               ],
               "type": "object"
             }
@@ -68,12 +74,18 @@
                   "title": "3scale AMP admin Address",
                   "type": "string",
                   "default": ""
+                },
+                "account_id": {
+                  "title": "3scale AMP account group id",
+                  "type": "string",
+                  "default": "5"
                 }
               },
               "required": [
                 "configuration_name",
                 "access_token",
-                "amp_address"
+                "amp_address",
+                "account_id"
               ],
               "type": "object"
             }

@@ -27,7 +27,8 @@ import com.redhat.syseng.openshift.service.broker.model.catalog.Catalog;
 import com.redhat.syseng.openshift.service.broker.model.catalog.Service;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
-import com.redhat.syseng.openshift.service.broker.persistence.PersistHashMapDAO;
+//import com.redhat.syseng.openshift.service.broker.persistence.PersistHashMapDAO;
+import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
 
 @Path("/v2")
 public class ThreeScaleBroker {
@@ -39,7 +40,7 @@ public class ThreeScaleBroker {
     @Produces({MediaType.APPLICATION_JSON})
     public Catalog getCatalog(@HeaderParam("X-Broker-Api-Version") String version) throws IOException, JAXBException, URISyntaxException {
         logger.info("Catalog called by version " + version);
-        PersistHashMapDAO persistence = PersistHashMapDAO.getInstance();
+        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
         Catalog catalog = new Catalog();
         Service[] services;
 
@@ -75,7 +76,8 @@ public class ThreeScaleBroker {
     public synchronized Result provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException {
         logger.info("Provisioning " + instance_id + " with data " + provision);
 
-        PersistHashMapDAO persistence = PersistHashMapDAO.getInstance();
+        //PersistHashMapDAO persistence = PersistHashMapDAO.getInstance();
+        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
         Result result;
         if (provision.getParameters().containsKey("input_url")) {
             result = new ServiceSecurer().provisioningForSecureService(instance_id, provision);
@@ -84,8 +86,10 @@ public class ThreeScaleBroker {
             Map<String, Object> parameters = provision.getParameters();
             String ampAddress = (String) parameters.get("amp_address");
             String accessToken = (String) parameters.get("access_token");
-            persistence.setAccessToken(accessToken);
-            persistence.setAmpAdminAddress(ampAddress);
+            String configurationName = (String) parameters.get("configuration_name");
+            String accountId = (String) parameters.get("account_id");
+            
+            persistence.persistAmpConfiguration(ampAddress, accessToken, configurationName, accountId);
             result = new Result("task_10", null);
         } else {
             result = new SecuredMarket().provision(instance_id, provision);
@@ -124,7 +128,7 @@ public class ThreeScaleBroker {
     @DELETE
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Produces({MediaType.APPLICATION_JSON})
-    public BindingResult unBinding(@PathParam("instance_id") String instanceId, @PathParam("binding_id") String bindingId) {
+    public synchronized BindingResult unBinding(@PathParam("instance_id") String instanceId, @PathParam("binding_id") String bindingId) {
         logger.info("unBinding instance_id:" + instanceId + ", binding_id: " + bindingId);
         return new BindingResult(null);
     }

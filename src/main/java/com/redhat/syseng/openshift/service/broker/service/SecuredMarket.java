@@ -25,6 +25,8 @@ import com.redhat.syseng.openshift.service.broker.model.catalog.ServiceBinding;
 import com.redhat.syseng.openshift.service.broker.model.catalog.ServiceInstance;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
+//import com.redhat.syseng.openshift.service.broker.persistence.PersistHashMapDAO;
+import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
 import com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil;
 
 import static com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil.getThreeScaleApiService;
@@ -43,10 +45,9 @@ public class SecuredMarket {
         logger.info("provision.getParameters().getApplicationName() : " + (String) inputParameters.get("applicationName"));
         logger.info("provision.getParameters().getDescription() : " + (String) inputParameters.get("description"));
 
-        //looks like I need to have an account ready first, and I don't see a REST api for create account, so I manually create one "brokerGroup", id is "5"
-        int accountId = 5;
+        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
 
-        String userKey = BrokerUtil.searchExistingApplicationBaseOnName((String) inputParameters.get("applicationName"), accountId);
+        String userKey = BrokerUtil.searchExistingApplicationBaseOnName((String) inputParameters.get("applicationName"), persistence.getAccountId());
 
         if (userKey.equals("")) {
             //create new Application to use the Plan, which will generate a new user_key
@@ -60,7 +61,7 @@ public class SecuredMarket {
             parameters.put("plan_id", provision.getPlan_id());
 
             //after this step, in the API Integration page, the user_key will automatically replaced with the new one created below
-            com.redhat.syseng.openshift.service.broker.model.amp.Application application = getThreeScaleApiService().createApplication(String.valueOf(accountId), parameters);
+            com.redhat.syseng.openshift.service.broker.model.amp.Application application = getThreeScaleApiService().createApplication(String.valueOf(persistence.getAccountId()), parameters);
             logger.info("---------------------application is created : " + application);
 
             userKey = application.getUserKey();
@@ -99,7 +100,6 @@ public class SecuredMarket {
 
     private Plan[] readPlansForOneService(String serviceId) throws JAXBException, URISyntaxException {
         //call the Application PLan List function
-        String ampUrl = "/admin/api/services/" + serviceId + "/application_plans.xml";
         Plans plans = getThreeScaleApiService().listApplicationPlan(serviceId);
         logger.info("AMP plans: " + plans);
         List<Plan> planList = new ArrayList<>();
@@ -163,15 +163,14 @@ public class SecuredMarket {
         String serviceId = inputStr.substring(inputStr.indexOf("service_id\":\"") + "service_id\":\"".length(), inputStr.indexOf("\",\"bind_resource"));
         logger.info("binding serviceId: " + serviceId);
 
-        //looks like I need to have an account ready first, and I don't see a REST api for create account, so I manually create one "brokerGroup", id is "5"
-        int account_id = 5;
+        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
         String endpoint = BrokerUtil.searchEndPointBasedOnServiceId(serviceId);
         if (endpoint == null) {
             Error error = new Error(410, "Service ID " + serviceId + " not found!");
             logger.severe("Failed to bind\n" + error);
             throw error.asException();
         } else {
-            String user_key = BrokerUtil.searchUserKeyBasedOnServiceAndPlanId(serviceId, planId, account_id);
+            String user_key = BrokerUtil.searchUserKeyBasedOnServiceAndPlanId(serviceId, planId, persistence.getAccountId());
             BindingResult result = new BindingResult(new BindingResult.Credentials(endpoint, user_key));
             logger.info("binding result:  " + result);
             return result;

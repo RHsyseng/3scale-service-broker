@@ -5,10 +5,6 @@
  */
 package com.redhat.syseng.openshift.service.broker.service.util;
 
-import com.redhat.syseng.openshift.service.broker.model.amp.Applications;
-import com.redhat.syseng.openshift.service.broker.model.amp.Application;
-import com.redhat.syseng.openshift.service.broker.model.amp.MappingRule;
-
 import java.util.HashMap;
 
 import javax.ws.rs.Consumes;
@@ -27,6 +23,10 @@ import com.redhat.syseng.openshift.service.broker.model.amp.Metrics;
 import com.redhat.syseng.openshift.service.broker.model.amp.Plan;
 import com.redhat.syseng.openshift.service.broker.model.amp.Service;
 import com.redhat.syseng.openshift.service.broker.model.amp.User;
+import com.redhat.syseng.openshift.service.broker.model.amp.Applications;
+import com.redhat.syseng.openshift.service.broker.model.amp.Application;
+import com.redhat.syseng.openshift.service.broker.model.amp.MappingRule;
+
 
 public interface ThreeScaleApiService {
 

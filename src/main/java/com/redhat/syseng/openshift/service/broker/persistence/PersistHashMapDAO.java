@@ -22,6 +22,14 @@ public class PersistHashMapDAO {
     private String ampAdminAddress;
 
     private Boolean loadSecuredMarket;
+    
+    //looks like I need to have an account ready first, and I don't see a REST api for create account, so I manually create one "brokerGroup", id is "5" for testing.
+    //TODO: This need to be moved to the configuration broker? 
+    private final int accountId = 5;
+
+    public int getAccountId() {
+        return accountId;
+    }
 
     private static Logger logger = Logger.getLogger(PersistHashMapDAO.class.getName());
 

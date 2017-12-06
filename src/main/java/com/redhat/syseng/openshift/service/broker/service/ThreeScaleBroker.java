@@ -82,6 +82,8 @@ public class ThreeScaleBroker {
         Result result;
         if (provision.getParameters().containsKey("input_url")) {
             result = new ServiceSecurer().provisioningForSecureService(instance_id, provision);
+                    logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ServiceSecurer Provisioning finished: " );
+
         } else if (provision.getParameters().containsKey("access_token")) {
             //This is the provision to setup the AMP configuration
             Map<String, Object> parameters = provision.getParameters();

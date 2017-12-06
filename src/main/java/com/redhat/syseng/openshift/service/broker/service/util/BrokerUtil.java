@@ -18,8 +18,9 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import com.redhat.syseng.openshift.service.broker.model.amp.Application;
 import com.redhat.syseng.openshift.service.broker.model.amp.Applications;
 import com.redhat.syseng.openshift.service.broker.model.amp.MappingRule;
-import com.redhat.syseng.openshift.service.broker.model.amp.Metric;
+
 import com.redhat.syseng.openshift.service.broker.model.amp.Metrics;
+import com.redhat.syseng.openshift.service.broker.model.amp.Metrics.Metric;
 import com.redhat.syseng.openshift.service.broker.model.amp.Plan;
 import com.redhat.syseng.openshift.service.broker.model.amp.Proxy;
 import com.redhat.syseng.openshift.service.broker.model.amp.Service;
@@ -93,7 +94,7 @@ public class BrokerUtil {
     public static String searchAnyUserKeyBasedOnServiceId(String serviceId) throws URISyntaxException {
         Applications applications = getThreeScaleApiService().listApplications();
         logger.info("searchAnyUserKeyBasedOnServiceId: " + applications);
-        
+
         String userKey = "";
         for (Application application : applications.getApplication()) {
             String svcId = String.valueOf(application.getServiceId());
@@ -157,12 +158,12 @@ public class BrokerUtil {
         //create mapping rule, first need to get the "hit" metric id.
         String metricId = "";
         Metrics metrics = getThreeScaleApiService().listMetric(serviceId);
-        for (Metric metric : metrics.getMetric()) {
-            logger.info("metricId name: " + metric.getName());
-            if (metric.getName().equalsIgnoreCase("Hits")) {
-                metricId = String.valueOf(metric.getId());
-            }
+        Metric metric = metrics.getMetric();
+        logger.info("metricId name: " + metric.getName());
+        if (metric.getName().equalsIgnoreCase("Hits")) {
+            metricId = String.valueOf(metric.getId());
         }
+
         logger.info("metricId : " + metricId);
 
         HashMap parameters = new HashMap();

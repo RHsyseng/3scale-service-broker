@@ -272,22 +272,22 @@ public class PersistSqlLiteDAO {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(SQLITE_DB_URL);
             connection.setAutoCommit(false);
-            logger.info("Opened database successfully");
+            //logger.info("Opened database successfully");
 
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PROVISION_TABLE (instance_id TEXT PRIMARY KEY,  provision_info TEXT);");
             String sqlString = "insert into PROVISION_TABLE values(\"" + instanceID + "\",\"" + provision.toString() + "\");";
-            logger.info("insert string: " + sqlString);
+            //logger.info("insert string: " + sqlString);
             stmt.executeUpdate(sqlString);
             connection.commit();
             stmt.close();
             connection.close();
         } catch (Exception e) {
-            logger.info(e.getClass().getName() + ": " + e.getMessage());
+            //logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        logger.info("persistProvisionInfo: instanceID" + instanceID + " provision: " + provision.toString());
+        //logger.info("persistProvisionInfo: instanceID" + instanceID + " provision: " + provision.toString());
 
     }
 
@@ -298,19 +298,19 @@ public class PersistSqlLiteDAO {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(SQLITE_DB_URL);
-            logger.info("Opened database successfully");
+            //logger.info("Opened database successfully");
 
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
             String sqlString = "SELECT provision_info FROM PROVISION_TABLE where instance_id = \"" + instanceID + "\";";
-            logger.info("select string: " + sqlString);
+            //logger.info("select string: " + sqlString);
 
             ResultSet rs = stmt.executeQuery(sqlString);
 
             while (rs.next()) {
                 result = rs.getString("provision_info");
-                logger.info("provisionInfo = " + result);
+                //logger.info("provisionInfo = " + result);
             }
             rs.close();
             stmt.close();
@@ -318,7 +318,7 @@ public class PersistSqlLiteDAO {
         } catch (Exception e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        logger.info("retrieveProvisionInfo: " + instanceID);
+        //logger.info("retrieveProvisionInfo: " + instanceID);
         return result;
 
     }
@@ -331,14 +331,14 @@ public class PersistSqlLiteDAO {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(SQLITE_DB_URL);
             connection.setAutoCommit(false);
-            logger.info("Opened database successfully");
+            //logger.info("Opened database successfully");
 
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS BINDING_TABLE (instance_id TEXT PRIMARY KEY,  binding_info TEXT);");
             String sqlString = "insert into BINDING_TABLE values(\"" + instanceID + "\",\"" + bindingInfo + "\");";
-            logger.info("insert string: " + sqlString);
+            //logger.info("insert string: " + sqlString);
             stmt.executeUpdate(sqlString);
             connection.commit();
             stmt.close();
@@ -346,7 +346,7 @@ public class PersistSqlLiteDAO {
         } catch (Exception e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        logger.info("persistBindingInfo: instanceID" + instanceID + " bindingInfo: " + bindingInfo);
+        //logger.info("persistBindingInfo: instanceID" + instanceID + " bindingInfo: " + bindingInfo);
 
     }
 
@@ -357,19 +357,19 @@ public class PersistSqlLiteDAO {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(SQLITE_DB_URL);
-            logger.info("Opened database successfully");
+            //logger.info("Opened database successfully");
 
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
             String sqlString = "SELECT binding_info FROM BINDING_TABLE where instance_id = \"" + instanceID + "\";";
-            logger.info("select string: " + sqlString);
+            //logger.info("select string: " + sqlString);
 
             ResultSet rs = stmt.executeQuery(sqlString);
 
             while (rs.next()) {
                 result = rs.getString("binding_info");
-                logger.info("binding_info = " + result);
+                //logger.info("binding_info = " + result);
             }
             rs.close();
             stmt.close();
@@ -377,7 +377,7 @@ public class PersistSqlLiteDAO {
         } catch (Exception e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        logger.info("retrieveBindingInfo: " + instanceID);
+        //logger.info("retrieveBindingInfo: " + instanceID);
         return result;
 
     }

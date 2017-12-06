@@ -186,7 +186,7 @@ public class SecuredMarket {
     }
 */    
     BindingResult binding(Binding binding) throws URISyntaxException {
-        String guid = binding.getOrganization_guid();
+        String guid = binding.getBind_resource().getApp_guid();
         logger.info("binding guid: " + guid);
         String planId = binding.getPlan_id();
         logger.info("binding planId: " + planId);

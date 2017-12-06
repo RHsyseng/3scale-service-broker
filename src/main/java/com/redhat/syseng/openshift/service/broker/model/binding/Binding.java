@@ -1,25 +1,10 @@
 package com.redhat.syseng.openshift.service.broker.model.binding;
 
-import com.redhat.syseng.openshift.service.broker.model.provision.Context;
-import java.util.Map;
-
 
 public class Binding {
     private String service_id;
 
-    private String organization_guid;
-
-    private String space_guid;
-
-    private Context context;
-
-    private Map<String, Object> parameters;
-    public Map<String, Object> getParameters() {
-        return parameters;
-    }
-    public void setParameters(Map<String, Object> parameters) {
-        this.parameters = parameters;
-    }  
+    private Bind_resource bind_resource;
 
     private String plan_id;
 
@@ -33,34 +18,14 @@ public class Binding {
         this.service_id = service_id;
     }
 
-    public String getOrganization_guid ()
+    public Bind_resource getBind_resource ()
     {
-        return organization_guid;
+        return bind_resource;
     }
 
-    public void setOrganization_guid (String organization_guid)
+    public void setBind_resource (Bind_resource bind_resource)
     {
-        this.organization_guid = organization_guid;
-    }
-
-    public String getSpace_guid ()
-    {
-        return space_guid;
-    }
-
-    public void setSpace_guid (String space_guid)
-    {
-        this.space_guid = space_guid;
-    }
-
-    public Context getContext ()
-    {
-        return context;
-    }
-
-    public void setContext (Context context)
-    {
-        this.context = context;
+        this.bind_resource = bind_resource;
     }
 
     public String getPlan_id ()
@@ -76,6 +41,7 @@ public class Binding {
     @Override
     public String toString()
     {
-        return "Binding {service_id = "+service_id+", organization_guid = "+organization_guid+", space_guid = "+space_guid+", context = "+context+", parameters = "+parameters+", plan_id = "+plan_id+"}";
-    }    
+        return "Binding {service_id = "+service_id+", bind_resource = "+bind_resource+", plan_id = "+plan_id+"]}";
+    }
+    
 }

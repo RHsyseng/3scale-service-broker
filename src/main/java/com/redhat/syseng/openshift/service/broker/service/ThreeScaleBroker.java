@@ -98,8 +98,8 @@ public class ThreeScaleBroker {
             result = new SecuredMarket().provision(instance_id, provision);
         }
         persistence.persistProvisionInfo(instance_id, provision);
-        logger.info("persist provision : " + persistence.retrieveProvisionInfo(instance_id).toString());
-        logger.info("provision.result : " + result);
+        //logger.info("persist provision : " + persistence.retrieveProvisionInfo(instance_id).toString());
+        logger.info("provision.result: " + result);
 
         return result;
 
@@ -113,15 +113,17 @@ public class ThreeScaleBroker {
     public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, String inputStr, @Context final HttpServletResponse response) throws URISyntaxException {
         try {
 
-            BindingResult result = new SecuredMarket().binding(inputStr);
-            logger.info("binding.result : " + result);
-            return result;
+            //BindingResult result = new SecuredMarket().binding(inputStr);
+            
+            logger.info("!!!!!!!!!!!!!!!!!binding.inputStr : " + inputStr);
+            return null;
         } catch (WebApplicationException e) {
             response.setStatus(410);
             return new BindingResult(null);
         }
     }
     */
+       
     
     @PUT
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
@@ -129,12 +131,8 @@ public class ThreeScaleBroker {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding, @Context final HttpServletResponse response) throws URISyntaxException {
         try {
-            /*
-            BindingResult result = new SecuredMarket().binding(inputStr);
-            logger.info("binding.result : " + result);
-            return result;
-*/
-            logger.info("binding: " + binding.toString());
+
+            logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
             BindingResult result = new SecuredMarket().binding(binding);
             logger.info("binding.result : " + result);
             return result;

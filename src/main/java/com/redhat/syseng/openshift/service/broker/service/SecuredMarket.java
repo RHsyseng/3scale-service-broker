@@ -13,6 +13,7 @@ import javax.xml.bind.JAXBException;
 import com.redhat.syseng.openshift.service.broker.model.Error;
 import com.redhat.syseng.openshift.service.broker.model.amp.Plans;
 import com.redhat.syseng.openshift.service.broker.model.amp.Services;
+import com.redhat.syseng.openshift.service.broker.model.binding.Binding;
 import com.redhat.syseng.openshift.service.broker.model.binding.BindingResult;
 import com.redhat.syseng.openshift.service.broker.model.catalog.ApplicationName;
 import com.redhat.syseng.openshift.service.broker.model.catalog.Create;
@@ -106,7 +107,13 @@ public class SecuredMarket {
         for (com.redhat.syseng.openshift.service.broker.model.amp.Plan ampPlan : plans.getPlan()) {
             Plan plan = new Plan();
             plan.setId(String.valueOf(ampPlan.getId()));
-            plan.setName(ampPlan.getName());
+            
+            //need to convert to lowercase, otherwise this error in getCatalog: 
+            //ClusterServicePlan.servicecatalog.k8s.io "6" is invalid: spec.externalName: Invalid value: "Basic": [-a-z0-9]+ (regex used for validation is 'plan-name-40d-0983-1b89')
+            String planName = ampPlan.getName();
+            logger.info("!!!!!!!!!!!!!!!!!! lower the case for ampPlan.getName()" + planName);
+            planName = planName.toLowerCase();
+            plan.setName(planName);
 
             plan.setDescription(" plan description ...");
             plan.setFree(true);
@@ -153,6 +160,7 @@ public class SecuredMarket {
         return planList.toArray(new Plan[planList.size()]);
     }
 
+    /*
     BindingResult binding(String inputStr) throws URISyntaxException {
         //public String binding(@PathParam("instance_id") String instance_id, @PathParam("binding_id") String binding_id) {
         logger.info("binding inputStr: " + inputStr);
@@ -176,4 +184,27 @@ public class SecuredMarket {
             return result;
         }
     }
+*/    
+    BindingResult binding(Binding binding) throws URISyntaxException {
+        String guid = binding.getOrganization_guid();
+        logger.info("binding guid: " + guid);
+        String planId = binding.getPlan_id();
+        logger.info("binding planId: " + planId);
+        String serviceId = binding.getService_id();
+        logger.info("binding serviceId: " + serviceId);
+
+        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        String endpoint = BrokerUtil.searchEndPointBasedOnServiceId(serviceId);
+        if (endpoint == null) {
+            Error error = new Error(410, "Service ID " + serviceId + " not found!");
+            logger.severe("Failed to bind\n" + error);
+            throw error.asException();
+        } else {
+            String user_key = BrokerUtil.searchUserKeyBasedOnServiceAndPlanId(serviceId, planId, persistence.getAccountId());
+            BindingResult result = new BindingResult(new BindingResult.Credentials(endpoint, user_key));
+            logger.info("binding result:  " + result);
+            return result;
+        }
+    }
+    
 }

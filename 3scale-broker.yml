@@ -3,4 +3,4 @@ kind: ClusterServiceBroker
 metadata:
   name: 3scale-broker
 spec:
-  url: http://three-scale.3scale-broker-poc.svc.cluster.local:8080
+  url: http://three-scale.3scale-service-broker.svc.cluster.local:8080

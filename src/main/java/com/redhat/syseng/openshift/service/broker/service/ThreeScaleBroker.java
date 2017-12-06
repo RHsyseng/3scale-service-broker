@@ -22,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redhat.syseng.openshift.service.broker.model.binding.Binding;
 import com.redhat.syseng.openshift.service.broker.model.binding.BindingResult;
 import com.redhat.syseng.openshift.service.broker.model.catalog.Catalog;
 import com.redhat.syseng.openshift.service.broker.model.catalog.Service;
@@ -102,12 +103,14 @@ public class ThreeScaleBroker {
 
     }
 
+    /*
     @PUT
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, String inputStr, @Context final HttpServletResponse response) throws URISyntaxException {
         try {
+
             BindingResult result = new SecuredMarket().binding(inputStr);
             logger.info("binding.result : " + result);
             return result;
@@ -116,6 +119,29 @@ public class ThreeScaleBroker {
             return new BindingResult(null);
         }
     }
+    */
+    
+    @PUT
+    @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding, @Context final HttpServletResponse response) throws URISyntaxException {
+        try {
+            /*
+            BindingResult result = new SecuredMarket().binding(inputStr);
+            logger.info("binding.result : " + result);
+            return result;
+*/
+            logger.info("binding: " + binding.toString());
+            BindingResult result = new SecuredMarket().binding(binding);
+            logger.info("binding.result : " + result);
+            return result;
+        } catch (WebApplicationException e) {
+            response.setStatus(410);
+            return new BindingResult(null);
+        }
+    }
+    
 
     @DELETE
     @Path("/service_instances/{instance_id}")

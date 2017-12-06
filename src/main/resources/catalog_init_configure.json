@@ -31,7 +31,7 @@
                   "type": "string"
                 },
                 "access_token": {
-                  "default": "34bbf459e196ac29e20aac4eace64f83445e7ea5f0c129f6d91e67d5666388c3",
+                  "default": "55044249b6efeaa6ff383df3ac3709824ba51f79438ef5aa57b134e381120c78",
                   "title": "3scale access token",
                   "type": "string"
                 },
@@ -43,7 +43,7 @@
                 "account_id": {
                   "title": "3scale AMP account group id",
                   "type": "string",
-                  "default": "5"
+                  "default": "4"
                 }
               },
               "required": [

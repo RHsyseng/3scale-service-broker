@@ -1,6 +1,6 @@
 {
   "name": "secure-service-3scale",
-  "id": "serviceUUID",
+  "id": "37c563f4-c80d-4f77-ab84-0c7059eb5b35",
   "description": "secure service 3scales broker implementation",
   "requires": [
     "route_forwarding"
@@ -36,7 +36,7 @@
   "plans": [
     {
       "id": "3scale-service-plan",
-      "name": "3scale-Service-Publishing",
+      "name": "3scale-service-publishing",
       "description": "Publish API to 3scale API Management Platform",
       "free": true,
       "schemas": {
@@ -52,7 +52,7 @@
                   "type": "string"
                 },
                 "application_plan": {
-                  "default": "Basic",
+                  "default": "basic",
                   "title": "3scale Application Plan",
                   "type": "string"
                 },
@@ -87,7 +87,7 @@
                   "type": "string"
                 },
                 "application_plan": {
-                  "default": "Basic",
+                  "default": "basic",
                   "title": "3scale Application Plan",
                   "type": "string"
                 },
@@ -124,7 +124,7 @@
                   "type": "string"
                 },
                 "application_plan": {
-                  "default": "Basic",
+                  "default": "basic",
                   "title": "3scale Application Plan",
                   "type": "string"
                 },

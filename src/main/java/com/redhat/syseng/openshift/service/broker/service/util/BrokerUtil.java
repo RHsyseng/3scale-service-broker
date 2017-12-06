@@ -134,7 +134,7 @@ public class BrokerUtil {
         for (Application application : applications.getApplication()) {
             String svcId = String.valueOf(application.getServiceId());
             if (svcId.endsWith(serviceId)) {
-                Plan plan = application.getPlan();
+                Application.Plan plan = application.getPlan();
                 String pid = String.valueOf(plan.getId());
                 if (pid.equals(planId)) {
                     userKey = application.getUserKey();

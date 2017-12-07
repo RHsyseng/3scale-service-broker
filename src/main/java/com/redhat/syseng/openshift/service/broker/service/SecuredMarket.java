@@ -207,4 +207,8 @@ public class SecuredMarket {
         }
     }
     
+        public void deProvisioning(String serviceId, String planIdF){
+        
+    }
+    
 }

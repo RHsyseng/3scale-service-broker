@@ -125,5 +125,10 @@ public class ServiceSecurer {
         logger.info("user is activated");
 
     }
+    
+    
+    public void deProvisioning(String serviceId, String planId){
+        
+    }
 
 }

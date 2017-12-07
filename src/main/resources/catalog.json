@@ -35,8 +35,8 @@
   },
   "plans": [
     {
-      "id": "3scale-service-plan",
-      "name": "3scale-service-publishing",
+      "id": "secure-service-plan",
+      "name": "secure-service-publishing-plan",
       "description": "Publish API to 3scale API Management Platform",
       "free": true,
       "schemas": {

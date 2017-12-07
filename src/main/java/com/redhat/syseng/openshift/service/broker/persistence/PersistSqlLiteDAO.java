@@ -82,7 +82,7 @@ public class PersistSqlLiteDAO {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(SQLITE_DB_URL);
-            logger.info("Opened database successfully");
+            //logger.info("Opened database successfully");
 
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
@@ -96,9 +96,9 @@ public class PersistSqlLiteDAO {
                 ampAdminAddress = rs.getString("admin_address");
                 accessToken = rs.getString("access_token");
                 accountId = rs.getString("account_id");
-                logger.info("ampAdminAddress = " + ampAdminAddress);
-                logger.info("accessToken = " + accessToken);
-                logger.info("accountId = " + accountId);
+                //logger.info("ampAdminAddress = " + ampAdminAddress);
+                //logger.info("accessToken = " + accessToken);
+                //logger.info("accountId = " + accountId);
             }
             rs.close();
             stmt.close();
@@ -108,7 +108,7 @@ public class PersistSqlLiteDAO {
         }
     }
 
-    public void persistAmpConfiguration(String ampAdminAddress, String accessToken, String configurationName, String accountId) {
+    public void persistAmpConfiguration(String instanceId, String ampAdminAddress, String accessToken, String configurationName, String accountId) {
 
         Connection connection = null;
         Statement stmt = null;
@@ -121,8 +121,8 @@ public class PersistSqlLiteDAO {
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS CONFIGURATION_TABLE (configuration_name TEXT PRIMARY KEY,  admin_address TEXT, access_token TEXT, account_id TEXT);");
-            String sqlString = "insert into CONFIGURATION_TABLE values(\"" + configurationName + "\",\"" + ampAdminAddress + "\",\"" + accessToken + "\",\"" + accountId + "\");";
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS CONFIGURATION_TABLE (instance_id TEXT PRIMARY KEY, configuration_name TEXT,  admin_address TEXT, access_token TEXT, account_id TEXT);");
+            String sqlString = "insert into CONFIGURATION_TABLE values(\"" + instanceId + "\",\"" + configurationName + "\",\"" + ampAdminAddress + "\",\"" + accessToken + "\",\"" + accountId + "\");";
             logger.info("insert string: " + sqlString);
             stmt.executeUpdate(sqlString);
             connection.commit();
@@ -131,10 +131,37 @@ public class PersistSqlLiteDAO {
         } catch (Exception e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        logger.info("persistAmpConfiguration: configurationName" + configurationName + " ampAdminAddress: " + ampAdminAddress);
+        //logger.info("persistAmpConfiguration: configurationName" + configurationName + " ampAdminAddress: " + ampAdminAddress);
 
     }
 
+    public void deleteAmpConfiguration(String instanceId) {
+
+        Connection connection = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection(SQLITE_DB_URL);
+            connection.setAutoCommit(false);
+            //logger.info("Opened database successfully");
+
+            stmt = connection.createStatement();
+            stmt.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            String sqlString = "delete from CONFIGURATION_TABLE where instance_id = \"" + instanceId + "\";";
+            //logger.info("insert string: " + sqlString);
+            stmt.executeUpdate(sqlString);
+            connection.commit();
+            stmt.close();
+            connection.close();
+        } catch (Exception e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+        }
+        logger.info("deleteAmpConfiguration" + instanceId );
+
+    }
+    
+    
     public boolean isLoadSecuredMarket() {
         if (loadSecuredMarket == null) {
             return true;
@@ -244,27 +271,8 @@ public class PersistSqlLiteDAO {
         System.out.println("Operation done successfully");
     }
      */
-    public static void main(String args[]) {
-        PersistSqlLiteDAO dao = new PersistSqlLiteDAO();
-        dao.persistProvisionInfo("instance1", "provision1");
-        dao.persistProvisionInfo("instance2", "provision2");
-        System.out.println("--retrieveProvisionInfo: " + dao.retrieveProvisionInfo("instance1"));
-        System.out.println();
 
-        dao.persistBindingInfo("instance1", "binding1");
-        dao.persistBindingInfo("instance2", "binding2");
-        System.out.println("--retrieveBindingInfo: " + dao.retrieveBindingInfo("instance1"));
-        System.out.println();
-        
-        dao.persistAmpConfiguration("http://test.com", "123456", "testConfiguration", "5");
-        dao.persistAmpConfiguration("http://test1.com", "555555", "testConfiguration2", "6");
-        System.out.println("--getAccessToken: " + dao.getAccessToken());
-        System.out.println("--getAmpAdminAddress: " + dao.getAmpAdminAddress());
-        System.out.println("--getAccountId: " + dao.getAccountId());
-
-    }
-
-    public void persistProvisionInfo(String instanceID, Object provision) {
+    public void persistProvisionInfo(String instanceId, Object provision) {
 
         Connection connection = null;
         Statement stmt = null;
@@ -278,20 +286,46 @@ public class PersistSqlLiteDAO {
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PROVISION_TABLE (instance_id TEXT PRIMARY KEY,  provision_info TEXT);");
-            String sqlString = "insert into PROVISION_TABLE values(\"" + instanceID + "\",\"" + provision.toString() + "\");";
+            String sqlString = "insert into PROVISION_TABLE values(\"" + instanceId + "\",\"" + provision.toString() + "\");";
             //logger.info("insert string: " + sqlString);
             stmt.executeUpdate(sqlString);
             connection.commit();
             stmt.close();
             connection.close();
         } catch (Exception e) {
-            //logger.info(e.getClass().getName() + ": " + e.getMessage());
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        //logger.info("persistProvisionInfo: instanceID" + instanceID + " provision: " + provision.toString());
+        //logger.info("persistProvisionInfo: instanceId" + instanceId + " provision: " + provision.toString());
 
     }
 
-    public Object retrieveProvisionInfo(String instanceID) {
+    public void deleteProvisionInfo(String instanceId) {
+
+        Connection connection = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection(SQLITE_DB_URL);
+            connection.setAutoCommit(false);
+            //logger.info("Opened database successfully");
+
+            stmt = connection.createStatement();
+            stmt.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            String sqlString = "delete from PROVISION_TABLE where instance_id =\"" + instanceId + "\";";
+            //logger.info("insert string: " + sqlString);
+            stmt.executeUpdate(sqlString);
+            connection.commit();
+            stmt.close();
+            connection.close();
+        } catch (Exception e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+        }
+        logger.info("deleteProvisionInfo: instanceId" + instanceId);
+
+    }
+
+    public Object retrieveProvisionInfo(String instanceId) {
         Connection connection = null;
         Statement stmt = null;
         String result = null;
@@ -303,7 +337,7 @@ public class PersistSqlLiteDAO {
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
-            String sqlString = "SELECT provision_info FROM PROVISION_TABLE where instance_id = \"" + instanceID + "\";";
+            String sqlString = "SELECT provision_info FROM PROVISION_TABLE where instance_id = \"" + instanceId + "\";";
             //logger.info("select string: " + sqlString);
 
             ResultSet rs = stmt.executeQuery(sqlString);
@@ -318,12 +352,12 @@ public class PersistSqlLiteDAO {
         } catch (Exception e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        //logger.info("retrieveProvisionInfo: " + instanceID);
+        //logger.info("retrieveProvisionInfo: " + instanceId);
         return result;
 
     }
 
-    public void persistBindingInfo(String instanceID, Object bindingInfo) {
+    public void persistBindingInfo(String instanceId, Object bindingInfo) {
 
         Connection connection = null;
         Statement stmt = null;
@@ -337,7 +371,7 @@ public class PersistSqlLiteDAO {
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS BINDING_TABLE (instance_id TEXT PRIMARY KEY,  binding_info TEXT);");
-            String sqlString = "insert into BINDING_TABLE values(\"" + instanceID + "\",\"" + bindingInfo + "\");";
+            String sqlString = "insert into BINDING_TABLE values(\"" + instanceId + "\",\"" + bindingInfo + "\");";
             //logger.info("insert string: " + sqlString);
             stmt.executeUpdate(sqlString);
             connection.commit();
@@ -346,11 +380,38 @@ public class PersistSqlLiteDAO {
         } catch (Exception e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        //logger.info("persistBindingInfo: instanceID" + instanceID + " bindingInfo: " + bindingInfo);
+        //logger.info("persistBindingInfo: instanceId" + instanceId + " bindingInfo: " + bindingInfo);
 
     }
+    
+    public void deleteBindingInfo(String instanceId) {
 
-    public Object retrieveBindingInfo(String instanceID) {
+        Connection connection = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection(SQLITE_DB_URL);
+            connection.setAutoCommit(false);
+            //logger.info("Opened database successfully");
+
+            stmt = connection.createStatement();
+            stmt.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            String sqlString = "delete from BINDING_TABLE where instance_id= \"" + instanceId + "\";";
+            //logger.info("insert string: " + sqlString);
+            stmt.executeUpdate(sqlString);
+            connection.commit();
+            stmt.close();
+            connection.close();
+        } catch (Exception e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+        }
+        logger.info("deleteBindingInfo " + instanceId);
+
+    }
+    
+
+    public Object retrieveBindingInfo(String instanceId) {
         Connection connection = null;
         Statement stmt = null;
         String result = null;
@@ -362,7 +423,7 @@ public class PersistSqlLiteDAO {
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
-            String sqlString = "SELECT binding_info FROM BINDING_TABLE where instance_id = \"" + instanceID + "\";";
+            String sqlString = "SELECT binding_info FROM BINDING_TABLE where instance_id = \"" + instanceId + "\";";
             //logger.info("select string: " + sqlString);
 
             ResultSet rs = stmt.executeQuery(sqlString);
@@ -377,9 +438,38 @@ public class PersistSqlLiteDAO {
         } catch (Exception e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        //logger.info("retrieveBindingInfo: " + instanceID);
+        //logger.info("retrieveBindingInfo: " + instanceId);
         return result;
 
     }
+    
+    
+    public static void main(String args[]) {
+        PersistSqlLiteDAO dao = new PersistSqlLiteDAO();
+        dao.persistProvisionInfo("instance1", "provision1");
+        dao.persistProvisionInfo("instance2", "provision2");
+        System.out.println("--retrieveProvisionInfo: " + dao.retrieveProvisionInfo("instance1"));
+        System.out.println();
+
+        dao.persistBindingInfo("instance1", "binding1");
+        dao.persistBindingInfo("instance2", "binding2");
+        System.out.println("--retrieveBindingInfo: " + dao.retrieveBindingInfo("instance1"));
+        System.out.println();
+        
+        dao.persistAmpConfiguration("instance1","http://test.com", "123456", "testConfiguration", "5");
+        dao.persistAmpConfiguration("instance2","http://test1.com", "555555", "testConfiguration2", "6");
+        System.out.println("--getAccessToken: " + dao.getAccessToken());
+        System.out.println("--getAmpAdminAddress: " + dao.getAmpAdminAddress());
+        System.out.println("--getAccountId: " + dao.getAccountId());
+        
+        dao.deleteProvisionInfo("instance1");
+        System.out.println("--retrieveProvisionInfo: " + dao.retrieveProvisionInfo("instance1"));
+        
+        dao.deleteBindingInfo("instance1");
+        System.out.println("--retrieveBindingInfo: " + dao.retrieveBindingInfo("instance1"));
+
+        dao.deleteAmpConfiguration("instance2");
+    }
+    
 
 }

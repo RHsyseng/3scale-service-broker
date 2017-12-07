@@ -11,10 +11,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
@@ -28,14 +29,15 @@ import com.redhat.syseng.openshift.service.broker.model.catalog.Catalog;
 import com.redhat.syseng.openshift.service.broker.model.catalog.Service;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
-//import com.redhat.syseng.openshift.service.broker.persistence.PersistHashMapDAO;
 import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
+import java.util.logging.Level;
+import javax.ws.rs.FormParam;
 
 @Path("/v2")
 public class ThreeScaleBroker {
-
+    
     private Logger logger = Logger.getLogger(getClass().getName());
-
+    
     @GET
     @Path("/catalog")
     @Produces({MediaType.APPLICATION_JSON})
@@ -44,7 +46,7 @@ public class ThreeScaleBroker {
         PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
         Catalog catalog = new Catalog();
         Service[] services;
-
+        
         if (null == persistence.getAccessToken() || null == persistence.getAmpAdminAddress()) {
             //read the configuration AMP catalog , which is static
             Reader catalogReader = new InputStreamReader(getClass().getResourceAsStream("/catalog_init_configure.json"));
@@ -54,7 +56,7 @@ public class ThreeScaleBroker {
             //read the catalog for secure service, which is static
             Reader catalogReader = new InputStreamReader(getClass().getResourceAsStream("/catalog.json"));
             Service threeScaleService = new ObjectMapper().readValue(catalogReader, Service.class);
-
+            
             if (persistence.isLoadSecuredMarket()) {
                 Service[] publishedServices = new SecuredMarket().getCatalog();
                 services = new Service[publishedServices.length + 1];
@@ -65,11 +67,11 @@ public class ThreeScaleBroker {
             }
         }
         catalog.setServices(services);
-
+        
         logger.info("Catalog is:\n\n" + catalog);
         return catalog;
     }
-
+    
     @PUT
     @Path("/service_instances/{instance_id}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -82,8 +84,8 @@ public class ThreeScaleBroker {
         Result result;
         if (provision.getParameters().containsKey("input_url")) {
             result = new ServiceSecurer().provisioningForSecureService(instance_id, provision);
-                    logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ServiceSecurer Provisioning finished: " );
-
+            logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ServiceSecurer Provisioning finished: ");
+            
         } else if (provision.getParameters().containsKey("access_token")) {
             //This is the provision to setup the AMP configuration
             Map<String, Object> parameters = provision.getParameters();
@@ -92,7 +94,7 @@ public class ThreeScaleBroker {
             String configurationName = (String) parameters.get("configuration_name");
             String accountId = (String) parameters.get("account_id");
             
-            persistence.persistAmpConfiguration(ampAddress, accessToken, configurationName, accountId);
+            persistence.persistAmpConfiguration(instance_id, ampAddress, accessToken, configurationName, accountId);
             result = new Result("task_10", null);
         } else {
             result = new SecuredMarket().provision(instance_id, provision);
@@ -100,9 +102,9 @@ public class ThreeScaleBroker {
         persistence.persistProvisionInfo(instance_id, provision);
         //logger.info("persist provision : " + persistence.retrieveProvisionInfo(instance_id).toString());
         logger.info("provision.result: " + result);
-
+        
         return result;
-
+        
     }
 
     /*
@@ -122,16 +124,14 @@ public class ThreeScaleBroker {
             return new BindingResult(null);
         }
     }
-    */
-       
-    
+     */
     @PUT
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding, @Context final HttpServletResponse response) throws URISyntaxException {
         try {
-
+            
             logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
             BindingResult result = new SecuredMarket().binding(binding);
             logger.info("binding.result : " + result);
@@ -142,15 +142,6 @@ public class ThreeScaleBroker {
         }
     }
     
-
-    @DELETE
-    @Path("/service_instances/{instance_id}")
-    @Produces({MediaType.APPLICATION_JSON})
-    public synchronized Result deProvisioning(@PathParam("instance_id") String instanceId) {
-        logger.info("deProvisioning instance_id: " + instanceId);
-        return new Result(null, null);
-    }
-
     @DELETE
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Produces({MediaType.APPLICATION_JSON})
@@ -158,4 +149,28 @@ public class ThreeScaleBroker {
         logger.info("unBinding instance_id:" + instanceId + ", binding_id: " + bindingId);
         return new BindingResult(null);
     }
+    
+    @DELETE
+    @Path("/service_instances/{instance_id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public synchronized Result deProvisioning(@PathParam("instance_id") String instanceId, @QueryParam("service_id") String serviceId, @QueryParam("plan_id") String planId) {
+        logger.info("deProvisioning instance_id: " + instanceId);
+        logger.info("deProvisioning serviceId: " + serviceId);
+        logger.info("deProvisioning planId: " + planId);
+        
+        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        if (planId.equals("configure-3scale-amp-plan")) {
+            logger.info("deProvisioning for configure-3scale-amp, will delete the persisted configuration now ");
+            persistence.deleteAmpConfiguration(instanceId);
+        } else if (planId.equals("secure-service-publishing-plan")) {
+            new ServiceSecurer().deProvisioning(serviceId, planId);
+        } else {
+            //The rest are secured market plan, which the plan id is integer
+            new SecuredMarket().deProvisioning(serviceId, planId);
+        }
+        persistence.deleteProvisionInfo(instanceId);
+        return new Result(null, null);
+        
+    }
+    
 }

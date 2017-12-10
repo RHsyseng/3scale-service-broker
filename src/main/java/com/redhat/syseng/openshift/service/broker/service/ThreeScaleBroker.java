@@ -83,8 +83,9 @@ public class ThreeScaleBroker {
         PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
         Result result;
         if (provision.getParameters().containsKey("input_url")) {
+
             result = new ServiceSecurer().provisioningForSecureService(instance_id, provision);
-            logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! ServiceSecurer Provisioning finished: ");
+            provision.setService_id(result.getServiceId());
             
         } else if (provision.getParameters().containsKey("access_token")) {
             //This is the provision to setup the AMP configuration
@@ -95,7 +96,7 @@ public class ThreeScaleBroker {
             String accountId = (String) parameters.get("account_id");
             
             persistence.persistAmpConfiguration(instance_id, ampAddress, accessToken, configurationName, accountId);
-            result = new Result("task_10", null);
+            result = new Result("task_10", null, null);
         } else {
             result = new SecuredMarket().provision(instance_id, provision);
         }
@@ -153,23 +154,28 @@ public class ThreeScaleBroker {
     @DELETE
     @Path("/service_instances/{instance_id}")
     @Produces({MediaType.APPLICATION_JSON})
-    public synchronized Result deProvisioning(@PathParam("instance_id") String instanceId, @QueryParam("service_id") String serviceId, @QueryParam("plan_id") String planId) {
+    public synchronized Result deProvisioning(@PathParam("instance_id") String instanceId, @QueryParam("service_id") String serviceId, @QueryParam("plan_id") String planId) throws URISyntaxException {
         logger.info("deProvisioning instance_id: " + instanceId);
         logger.info("deProvisioning serviceId: " + serviceId);
         logger.info("deProvisioning planId: " + planId);
         
         PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
-        if (planId.equals("configure-3scale-amp-plan")) {
+        if (planId.equals("configure-3scale-amp-plan-id")) {
             logger.info("deProvisioning for configure-3scale-amp, will delete the persisted configuration now ");
             persistence.deleteAmpConfiguration(instanceId);
-        } else if (planId.equals("secure-service-publishing-plan")) {
-            new ServiceSecurer().deProvisioning(serviceId, planId);
+        } else if (planId.equals("secure-service-plan-id")) {
+            logger.info("deProvisioning for secure service, will delete the provisoned service from 3scale AMP");
+            
+            //Note the serviceId passed from Queryparam is from catalog, which is a static one. 
+            //The real serviceId need to get from the persistence layer. 
+            new ServiceSecurer().deProvisioning(instanceId);
         } else {
             //The rest are secured market plan, which the plan id is integer
+            logger.info("deProvisioning for secured market, will delete the application from 3scale AMP");
             new SecuredMarket().deProvisioning(serviceId, planId);
         }
         persistence.deleteProvisionInfo(instanceId);
-        return new Result(null, null);
+        return new Result(null, null, null);
         
     }
     

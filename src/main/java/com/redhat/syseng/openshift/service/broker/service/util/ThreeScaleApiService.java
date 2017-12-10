@@ -26,6 +26,7 @@ import com.redhat.syseng.openshift.service.broker.model.amp.User;
 import com.redhat.syseng.openshift.service.broker.model.amp.Applications;
 import com.redhat.syseng.openshift.service.broker.model.amp.Application;
 import com.redhat.syseng.openshift.service.broker.model.amp.MappingRule;
+import javax.ws.rs.DELETE;
 
 
 public interface ThreeScaleApiService {
@@ -43,6 +44,12 @@ public interface ThreeScaleApiService {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     Service createService(HashMap parameters);
 
+    @DELETE
+    @Path("/admin/api/services/{serviceId}.xml")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    Service deleteService(@PathParam("serviceId") String serviceId);
+    
 
     @GET
     @Path("/admin/api/services/{serviceId}/application_plans.xml")

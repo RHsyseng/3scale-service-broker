@@ -1,6 +1,6 @@
 {
   "name": "secure-service-3scale",
-  "id": "37c563f4-c80d-4f77-ab84-0c7059eb5b35",
+  "id": "secure-service-id",
   "description": "secure service 3scales broker implementation",
   "requires": [
     "route_forwarding"
@@ -35,8 +35,8 @@
   },
   "plans": [
     {
-      "id": "secure-service-plan",
-      "name": "secure-service-publishing-plan",
+      "id": "secure-service-plan-id",
+      "name": "secure-service-plan-name",
       "description": "Publish API to 3scale API Management Platform",
       "free": true,
       "schemas": {

@@ -1,6 +1,6 @@
 {
   "name": "configure-3scale-amp",
-  "id": "37c563f4-c80d-4f77-ab84-0c7059eb5b35",
+  "id": "config-amp-id",
   "description": "3scale AMP backend server configuration",
   "requires": [
     "route_forwarding"
@@ -14,8 +14,8 @@
   },
   "plans": [
     {
-      "id": "configure-3scale-amp-plan",
-      "name": "configure-3scale-amp",
+      "id": "configure-3scale-amp-plan-id",
+      "name": "configure-3scale-amp-plan-name",
       "description": "Configuration to 3scale API Management Platform",
       "free": true,
       "schemas": {

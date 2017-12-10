@@ -71,7 +71,7 @@ public class SecuredMarket {
 
         String endpoint = BrokerUtil.searchEndPointBasedOnServiceId(provision.getService_id());
         String url = endpoint + "/?user_key=" + userKey;
-        Result result = new Result("task_10", url);
+        Result result = new Result("task_10", url, null);
         logger.info("provisioning result" + result);
         return result;
     }
@@ -107,7 +107,7 @@ public class SecuredMarket {
         for (com.redhat.syseng.openshift.service.broker.model.amp.Plan ampPlan : plans.getPlan()) {
             Plan plan = new Plan();
             plan.setId(String.valueOf(ampPlan.getId()));
-            
+
             //need to convert to lowercase, otherwise this error in getCatalog: 
             //ClusterServicePlan.servicecatalog.k8s.io "6" is invalid: spec.externalName: Invalid value: "Basic": [-a-z0-9]+ (regex used for validation is 'plan-name-40d-0983-1b89')
             String planName = ampPlan.getName();
@@ -184,7 +184,7 @@ public class SecuredMarket {
             return result;
         }
     }
-*/    
+     */
     BindingResult binding(Binding binding) throws URISyntaxException {
         String guid = binding.getBind_resource().getApp_guid();
         logger.info("binding guid: " + guid);
@@ -206,9 +206,9 @@ public class SecuredMarket {
             return result;
         }
     }
-    
-        public void deProvisioning(String serviceId, String planIdF){
-        
+
+    public void deProvisioning(String serviceId, String planId) throws URISyntaxException {
+
     }
-    
+
 }

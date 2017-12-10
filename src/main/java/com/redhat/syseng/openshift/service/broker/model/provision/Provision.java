@@ -3,6 +3,7 @@ package com.redhat.syseng.openshift.service.broker.model.provision;
 import java.util.Map;
 
 public class Provision {
+
     private String service_id;
 
     private String organization_guid;
@@ -13,19 +14,17 @@ public class Provision {
 
     private Context context;
 
-
     private String plan_id;
-    
-    
-    
+
     private Map<String, Object> parameters;
+
     public Map<String, Object> getParameters() {
         return parameters;
     }
+
     public void setParameters(Map<String, Object> parameters) {
         this.parameters = parameters;
-    }    
-
+    }
 
     public String getService_id() {
         return service_id;
@@ -66,7 +65,6 @@ public class Provision {
     public void setContext(Context context) {
         this.context = context;
     }
-
 
     public String getPlan_id() {
         return plan_id;

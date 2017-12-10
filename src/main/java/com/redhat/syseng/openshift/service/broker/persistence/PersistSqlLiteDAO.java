@@ -36,7 +36,7 @@ public class PersistSqlLiteDAO {
 
         //TODO: for testing only, by pass the configuration step
         //ampAdminAddress = "amp-admin";
-        //accessToken = "34bbf459e196ac29e20aac4eace64f83445e7ea5f0c129f6d91e67d5666388c3";
+        //accessToken = "55044249b6efeaa6ff383df3ac3709824ba51f79438ef5aa57b134e381120c78";
         String loadSecuredMarketString = System.getenv("LOAD_SECURED_SERVICE_MARKET");
         if (loadSecuredMarketString != null) {
             loadSecuredMarket = Boolean.valueOf(loadSecuredMarketString);
@@ -258,9 +258,7 @@ public class PersistSqlLiteDAO {
                 System.out.println("provision_info = " + provisionInfo);
                 System.out.println();
             }
-
             connection.commit();
-
             rs.close();
             stmt.close();
             connection.close();
@@ -280,14 +278,14 @@ public class PersistSqlLiteDAO {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection(SQLITE_DB_URL);
             connection.setAutoCommit(false);
-            //logger.info("Opened database successfully");
+            //logger.info("persistProvisionInfo Opened database successfully");
 
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PROVISION_TABLE (instance_id TEXT PRIMARY KEY,  provision_info TEXT);");
             String sqlString = "insert into PROVISION_TABLE values(\"" + instanceId + "\",\"" + provision.toString() + "\");";
-            //logger.info("insert string: " + sqlString);
+            logger.info("insert string: " + sqlString);
             stmt.executeUpdate(sqlString);
             connection.commit();
             stmt.close();
@@ -295,7 +293,7 @@ public class PersistSqlLiteDAO {
         } catch (Exception e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        //logger.info("persistProvisionInfo: instanceId" + instanceId + " provision: " + provision.toString());
+        logger.info("persistProvisionInfo: instanceId" + instanceId + " provision: " + provision.toString());
 
     }
 
@@ -325,7 +323,7 @@ public class PersistSqlLiteDAO {
 
     }
 
-    public Object retrieveProvisionInfo(String instanceId) {
+    public String retrieveProvisionInfo(String instanceId) {
         Connection connection = null;
         Statement stmt = null;
         String result = null;

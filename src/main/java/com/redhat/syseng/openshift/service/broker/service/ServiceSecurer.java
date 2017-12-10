@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import org.apache.commons.lang3.RandomStringUtils;
-
 import com.redhat.syseng.openshift.service.broker.model.amp.Plan;
 import com.redhat.syseng.openshift.service.broker.model.amp.Proxy;
 import com.redhat.syseng.openshift.service.broker.model.amp.User;
@@ -22,9 +21,9 @@ public class ServiceSecurer {
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    Result provisioningForSecureService(String instance_id, Provision provision) throws URISyntaxException //public String provisioning( String testString) {
+    Result provisioningForSecureService(String instanceId, Provision provision) throws URISyntaxException //public String provisioning( String testString) {
     {
-        logger.info("!!!!!!!!!!provisioning /service_instances/{instance_id} : " + instance_id);
+        logger.info("!!!!!!!!!!provisioning /service_instances/{instance_id} : " + instanceId);
         logger.info("provision.getService_id() : " + provision.getService_id());
         logger.info("provision.getOrganization_guid() : " + provision.getOrganization_guid());
 
@@ -37,18 +36,22 @@ public class ServiceSecurer {
 
         PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
         String url = searchServiceInstance((String) inputParameters.get("service_name"));
+        
+       String newServiceId ="";
         //no existing service, need to create one
         if ("".equals(url)) {
 
             HashMap parameters = new HashMap();
             parameters.put("name", (String) inputParameters.get("service_name"));
             parameters.put("system_name", (String) inputParameters.get("service_name"));
-            parameters.put("description", "instance_id:" + instance_id);
+            parameters.put("description", "instance_id:" + instanceId);
 
             com.redhat.syseng.openshift.service.broker.model.amp.Service service = getThreeScaleApiService().createService(parameters);
             logger.info("---------------------services is created : " + service.getName());
             String serviceId = String.valueOf(service.getId());
             logger.info("serviceId : " + serviceId);
+            //use the real service id to replace old one from catalog.json, which will be passed back and persist.
+            newServiceId = serviceId;
 
             //create applicaiton plan
             parameters = new HashMap();
@@ -85,12 +88,12 @@ public class ServiceSecurer {
             url = "https://" + (String) inputParameters.get("service_name") + domain + "/?user_key=" + application.getUserKey();
         }
 
-        return new Result("task_10", url);
+        return new Result("task_10", url, newServiceId);
     }
 
     public synchronized BindingResult binding(String inputStr) throws URISyntaxException {
         logger.info("binding inputStr: " + inputStr);
-        
+
         //TODO: right now it seems binding couldn't accept input parameters defined in catalog, I generated random username and password for tetsing for now.
         boolean useLetters = true;
         boolean useNumbers = false;
@@ -125,10 +128,14 @@ public class ServiceSecurer {
         logger.info("user is activated");
 
     }
-    
-    
-    public void deProvisioning(String serviceId, String planId){
-        
+
+    public void deProvisioning(String instanceId) throws URISyntaxException {
+        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        String provisionInfo = persistence.retrieveProvisionInfo(instanceId);
+        logger.info("deProvisioning in ServiceSecurer, provisionInfo  : " + provisionInfo);
+        String serviceId = provisionInfo.substring(provisionInfo.indexOf("service_id='") + "service_id='".length(), provisionInfo.indexOf("', organization_guid"));
+        logger.info("deProvisioning in ServiceSecurer, serviceId  : " + serviceId);
+        getThreeScaleApiService().deleteService(serviceId);
     }
 
 }

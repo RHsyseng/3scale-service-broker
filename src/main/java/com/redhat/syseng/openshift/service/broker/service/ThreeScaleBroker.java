@@ -99,6 +99,8 @@ public class ThreeScaleBroker {
             result = new Result("task_10", null, null);
         } else {
             result = new SecuredMarket().provision(instance_id, provision);
+            Map<String, Object> parameters = provision.getParameters();
+            parameters.put("applicationId", result.getAppliationId());
         }
         persistence.persistProvisionInfo(instance_id, provision);
         //logger.info("persist provision : " + persistence.retrieveProvisionInfo(instance_id).toString());
@@ -161,8 +163,8 @@ public class ThreeScaleBroker {
         
         PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
         if (planId.equals("configure-3scale-amp-plan-id")) {
-            logger.info("deProvisioning for configure-3scale-amp, will delete the persisted configuration now ");
             persistence.deleteAmpConfiguration(instanceId);
+            logger.info("deProvisioning for configure-3scale-amp, the persisted configuration is deleted");
         } else if (planId.equals("secure-service-plan-id")) {
             logger.info("deProvisioning for secure service, will delete the provisoned service from 3scale AMP");
             
@@ -172,7 +174,7 @@ public class ThreeScaleBroker {
         } else {
             //The rest are secured market plan, which the plan id is integer
             logger.info("deProvisioning for secured market, will delete the application from 3scale AMP");
-            new SecuredMarket().deProvisioning(serviceId, planId);
+            new SecuredMarket().deProvisioning(instanceId);
         }
         persistence.deleteProvisionInfo(instanceId);
         return new Result(null, null, null);

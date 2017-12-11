@@ -86,13 +86,19 @@ public interface ThreeScaleApiService {
     @Path("/admin/api/accounts/{accountId}/applications.xml")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    Applications getApplications(@PathParam("accountId") String serviceId);
+    Applications getApplications(@PathParam("accountId") String accountId);
 
     @POST
     @Path("/admin/api/accounts/{accountId}/applications.xml")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    Application createApplication(@PathParam("accountId") String serviceId, HashMap parameters);
+    Application createApplication(@PathParam("accountId") String accountId, HashMap parameters);
+
+    @DELETE
+    @Path("/admin/api/accounts/{accountId}/applications/{id}.xml")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    void deleteApplication(@PathParam("accountId") String accountId, @PathParam("id") String id);
 
     @GET
     @Path("/admin/api/services/{serviceId}/proxy.xml")

@@ -5,6 +5,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Result {
     private String serviceId;
+    private String appliationId;
+
+    public String getAppliationId() {
+        return appliationId;
+    }
+
+    public void setAppliationId(String appliationId) {
+        this.appliationId = appliationId;
+    }
 
     public String getServiceId() {
         return serviceId;

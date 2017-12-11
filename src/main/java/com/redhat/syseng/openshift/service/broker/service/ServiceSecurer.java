@@ -36,8 +36,8 @@ public class ServiceSecurer {
 
         PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
         String url = searchServiceInstance((String) inputParameters.get("service_name"));
-        
-       String newServiceId ="";
+
+        String newServiceId = "";
         //no existing service, need to create one
         if ("".equals(url)) {
 
@@ -132,10 +132,13 @@ public class ServiceSecurer {
     public void deProvisioning(String instanceId) throws URISyntaxException {
         PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
         String provisionInfo = persistence.retrieveProvisionInfo(instanceId);
-        logger.info("deProvisioning in ServiceSecurer, provisionInfo  : " + provisionInfo);
-        String serviceId = provisionInfo.substring(provisionInfo.indexOf("service_id='") + "service_id='".length(), provisionInfo.indexOf("', organization_guid"));
-        logger.info("deProvisioning in ServiceSecurer, serviceId  : " + serviceId);
-        getThreeScaleApiService().deleteService(serviceId);
+        if (null != provisionInfo && !"".equals(provisionInfo)) {
+            String serviceId = provisionInfo.substring(provisionInfo.indexOf("service_id='") + "service_id='".length(), provisionInfo.indexOf("', organization_guid"));
+            logger.info("ServiceSecurer.deProvisioning, serviceId  : " + serviceId);
+            if (null != serviceId && !"".equals(serviceId)) {
+                getThreeScaleApiService().deleteService(serviceId);
+            }
+        }
     }
 
 }

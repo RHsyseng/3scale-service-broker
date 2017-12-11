@@ -5,7 +5,7 @@
   "requires": [
     "route_forwarding"
   ],
-  "bindable": true,
+  "bindable": false,
   "metadata": {
     "displayName": "secure-service-3scale",
     "documentationUrl": "https://access.qa.redhat.com/documentation/en-us/reference_architectures/2017/html/api_management_with_red_hat_3scale_api_management_platform",

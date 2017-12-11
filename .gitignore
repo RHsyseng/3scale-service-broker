@@ -3,3 +3,4 @@ nb-configuration.xml
 *.iml
 target
 nohup.out
+*.sh

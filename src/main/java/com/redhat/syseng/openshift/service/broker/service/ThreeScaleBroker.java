@@ -83,7 +83,7 @@ public class ThreeScaleBroker {
         PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
         Result result;
         if (provision.getParameters().containsKey("input_url")) {
-
+            
             result = new ServiceSecurer().provisioningForSecureService(instance_id, provision);
             provision.setService_id(result.getServiceId());
             
@@ -138,6 +138,8 @@ public class ThreeScaleBroker {
             logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
             BindingResult result = new SecuredMarket().binding(binding);
             logger.info("binding.result : " + result);
+            PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+            persistence.persistBindingInfo(instance_id, binding);
             return result;
         } catch (WebApplicationException e) {
             response.setStatus(410);
@@ -149,7 +151,12 @@ public class ThreeScaleBroker {
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Produces({MediaType.APPLICATION_JSON})
     public synchronized BindingResult unBinding(@PathParam("instance_id") String instanceId, @PathParam("binding_id") String bindingId) {
-        logger.info("unBinding instance_id:" + instanceId + ", binding_id: " + bindingId);
+        //Since for configurationAMP and serviceSecure there are no binding
+        //and for securedMarket binding, it doesn't really create anything in 3scale AMP, just return URL and user_key, 
+        //so nothing need to be deleted for unbinding at 3scale side, just delete the binding info from persistence.
+        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        persistence.deleteBindingInfo(instanceId);
+        logger.info("unBinding finished, instance_id:" + instanceId + ", binding_id: " + bindingId);
         return new BindingResult(null);
     }
     
@@ -167,7 +174,7 @@ public class ThreeScaleBroker {
             logger.info("deProvisioning for configure-3scale-amp, the persisted configuration is deleted");
         } else if (planId.equals("secure-service-plan-id")) {
             logger.info("deProvisioning for secure service, will delete the provisoned service from 3scale AMP");
-            
+
             //Note the serviceId passed from Queryparam is from catalog, which is a static one. 
             //The real serviceId need to get from the persistence layer. 
             new ServiceSecurer().deProvisioning(instanceId);

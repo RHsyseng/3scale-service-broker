@@ -26,7 +26,7 @@ import com.redhat.syseng.openshift.service.broker.model.catalog.ServiceBinding;
 import com.redhat.syseng.openshift.service.broker.model.catalog.ServiceInstance;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
-//import com.redhat.syseng.openshift.service.broker.persistence.PersistHashMapDAO;
+import com.redhat.syseng.openshift.service.broker.model.service.ServiceParameters;
 import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
 import com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil;
 
@@ -53,17 +53,14 @@ public class SecuredMarket {
         
         if (userKey.equals("")) {
             //create new Application to use the Plan, which will generate a new user_key
-            //Add GUID in the description, so later the binding can find this application based on guid. 
-            //update on Oct 23, it seems GUID is not unique for each binding...leave it for now, but adding instance_id as well
-            String desc = (String) inputParameters.get("description") + " GUID:" + provision.getOrganization_guid() + " instance_id:" + instance_id;
-            
-            HashMap parameters = new HashMap();
-            parameters.put("name", (String) inputParameters.get("applicationName"));
-            parameters.put("description", desc);
-            parameters.put("plan_id", provision.getPlan_id());
-
+            String desc = (String) inputParameters.get("description");
+            ServiceParameters sp = new ServiceParameters();
+            sp.setName((String) inputParameters.get("applicationName"));
+            sp.setDescription(desc);
+            sp.setPlan_id(provision.getPlan_id());
+                        
             //after this step, in the API Integration page, the user_key will automatically replaced with the new one created below
-            com.redhat.syseng.openshift.service.broker.model.amp.Application application = getThreeScaleApiService().createApplication(String.valueOf(persistence.getAccountId()), parameters);
+            com.redhat.syseng.openshift.service.broker.model.amp.Application application = getThreeScaleApiService().createApplication(String.valueOf(persistence.getAccountId()), sp);
             logger.info("---------------------application is created, id is : " + application.getId());
             applicationId = String.valueOf(application.getId());
             

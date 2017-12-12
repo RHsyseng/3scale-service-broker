@@ -26,6 +26,8 @@ import com.redhat.syseng.openshift.service.broker.model.amp.User;
 import com.redhat.syseng.openshift.service.broker.model.amp.Applications;
 import com.redhat.syseng.openshift.service.broker.model.amp.Application;
 import com.redhat.syseng.openshift.service.broker.model.amp.MappingRule;
+import com.redhat.syseng.openshift.service.broker.model.service.MappingRulesParameters;
+import com.redhat.syseng.openshift.service.broker.model.service.ServiceParameters;
 import javax.ws.rs.DELETE;
 
 
@@ -42,7 +44,7 @@ public interface ThreeScaleApiService {
     @Path("/admin/api/services.xml")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    Service createService(HashMap parameters);
+    Service createService(ServiceParameters sp);
 
     @DELETE
     @Path("/admin/api/services/{serviceId}.xml")
@@ -61,20 +63,14 @@ public interface ThreeScaleApiService {
     @Path("/admin/api/services/{serviceId}/application_plans.xml")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    Plan createApplicationPlan(@PathParam("serviceId") String serviceId, HashMap parameters);
+    Plan createApplicationPlan(@PathParam("serviceId") String serviceId, ServiceParameters sp);
 
 
     @POST
     @Path("/admin/api/services/{serviceId}/proxy/mapping_rules.xml")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    MappingRule createMappingRules(@PathParam("serviceId") String serviceId, HashMap parameters);
-
-    @POST
-    @Path("/admin/api/accounts/{accountId}/users.xml")
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    User createUser(@PathParam("accountId") String accountId, HashMap parameters);
+    MappingRule createMappingRules(@PathParam("serviceId") String serviceId, MappingRulesParameters mp);
 
     @GET
     @Path("/admin/api/applications.xml")
@@ -92,7 +88,7 @@ public interface ThreeScaleApiService {
     @Path("/admin/api/accounts/{accountId}/applications.xml")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    Application createApplication(@PathParam("accountId") String accountId, HashMap parameters);
+    Application createApplication(@PathParam("accountId") String accountId, ServiceParameters sp);
 
     @DELETE
     @Path("/admin/api/accounts/{accountId}/applications/{id}.xml")
@@ -110,8 +106,7 @@ public interface ThreeScaleApiService {
     @Path("/admin/api/services/{serviceId}/proxy.xml")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    Proxy updateProxy(@PathParam("serviceId") String serviceId, HashMap parameters);
-
+    Proxy updateProxy(@PathParam("serviceId") String serviceId, ServiceParameters sp);
 
     @GET
     @Path("/admin/api/services/{serviceId}/metrics.xml")
@@ -119,9 +114,18 @@ public interface ThreeScaleApiService {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     Metrics listMetric(@PathParam("serviceId") String serviceId);
 
+    /*
     @PUT
     @Path("/admin/api/accounts/{accountId}/users/{id}/activate.xml")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     String activeUser(@PathParam("accountId") String accountId, @PathParam("id") String id, HashMap parameters);
+
+    @POST
+    @Path("/admin/api/accounts/{accountId}/users.xml")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    User createUser(@PathParam("accountId") String accountId, HashMap parameters);
+    */
+    
 }

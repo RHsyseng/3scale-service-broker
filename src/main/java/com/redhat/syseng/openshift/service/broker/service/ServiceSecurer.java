@@ -4,14 +4,11 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
-import org.apache.commons.lang3.RandomStringUtils;
 import com.redhat.syseng.openshift.service.broker.model.amp.Plan;
 import com.redhat.syseng.openshift.service.broker.model.amp.Proxy;
-import com.redhat.syseng.openshift.service.broker.model.amp.User;
-import com.redhat.syseng.openshift.service.broker.model.binding.BindingResult;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
-//import com.redhat.syseng.openshift.service.broker.persistence.PersistHashMapDAO;
+import com.redhat.syseng.openshift.service.broker.model.service.ServiceParameters;
 import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
 import static com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil.createMappingRules;
 import static com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil.getThreeScaleApiService;
@@ -46,18 +43,22 @@ public class ServiceSecurer {
             parameters.put("system_name", (String) inputParameters.get("service_name"));
             parameters.put("description", "instance_id:" + instanceId);
 
-            com.redhat.syseng.openshift.service.broker.model.amp.Service service = getThreeScaleApiService().createService(parameters);
+            ServiceParameters sp = new ServiceParameters();            
+            sp.setName((String) inputParameters.get("service_name"));
+            sp.setSystem_name((String) inputParameters.get("service_name"));
+            sp.setDescription("instance_id:" + instanceId);
+            
+            com.redhat.syseng.openshift.service.broker.model.amp.Service service = getThreeScaleApiService().createService(sp);
             logger.info("---------------------services is created : " + service.getName());
             String serviceId = String.valueOf(service.getId());
             logger.info("serviceId : " + serviceId);
             //use the real service id to replace old one from catalog.json, which will be passed back and persist.
             newServiceId = serviceId;
 
-            //create applicaiton plan
-            parameters = new HashMap();
-            parameters.put("name", (String) inputParameters.get("application_plan"));
-            parameters.put("system_name", (String) inputParameters.get("application_plan"));
-            Plan plan = getThreeScaleApiService().createApplicationPlan(serviceId, parameters);
+            sp = new ServiceParameters();
+            sp.setName((String) inputParameters.get("application_plan"));
+            sp.setSystem_name((String) inputParameters.get("application_plan"));
+            Plan plan = getThreeScaleApiService().createApplicationPlan(serviceId, sp);
 
             logger.info("---------------------application plan is created: " + plan.getName());
             logger.info("planId : " + plan.getId());
@@ -65,21 +66,20 @@ public class ServiceSecurer {
             createMappingRules(serviceId);
 
             //API integration
-            parameters = new HashMap();
-            parameters.put("service_id", serviceId);
-            parameters.put("api_backend", (String) inputParameters.get("input_url"));
-            Proxy proxy = getThreeScaleApiService().updateProxy(serviceId, parameters);
-
+            sp = new ServiceParameters();
+            sp.setService_id(serviceId);
+            sp.setApi_backend((String) inputParameters.get("input_url"));
+            Proxy proxy = getThreeScaleApiService().updateProxy(serviceId, sp);
             logger.info("---------------------integration result endPoint : " + proxy.getEndpoint());
 
             //create Application to use the Plan, which will generate a valid user_key
-            parameters = new HashMap();
-            parameters.put("name", (String) inputParameters.get("application_name"));
-            parameters.put("description", (String) inputParameters.get("application_name"));
-            parameters.put("plan_id", plan.getId());
+            sp = new ServiceParameters();
+            sp.setName((String) inputParameters.get("application_name"));
+            sp.setDescription((String) inputParameters.get("application_name"));
+            sp.setPlan_id(String.valueOf(plan.getId()));
 
             //after this step, in the API Integration page, the user_key will automatically replaced with the new one created below
-            com.redhat.syseng.openshift.service.broker.model.amp.Application application = getThreeScaleApiService().createApplication(persistence.getAccountId(), parameters);
+            com.redhat.syseng.openshift.service.broker.model.amp.Application application = getThreeScaleApiService().createApplication(persistence.getAccountId(), sp);
 
             logger.info("---------------------application is created : " + application.getName());
             logger.info("user_key : " + application.getUserKey());
@@ -91,6 +91,7 @@ public class ServiceSecurer {
         return new Result("task_10", url, newServiceId);
     }
 
+    /*
     public synchronized BindingResult binding(String inputStr) throws URISyntaxException {
         logger.info("binding inputStr: " + inputStr);
 
@@ -128,6 +129,7 @@ public class ServiceSecurer {
         logger.info("user is activated");
 
     }
+*/
 
     public void deProvisioning(String instanceId) throws URISyntaxException {
         PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();

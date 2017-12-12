@@ -21,10 +21,10 @@ import com.redhat.syseng.openshift.service.broker.model.amp.MappingRule;
 
 import com.redhat.syseng.openshift.service.broker.model.amp.Metrics;
 import com.redhat.syseng.openshift.service.broker.model.amp.Metrics.Metric;
-import com.redhat.syseng.openshift.service.broker.model.amp.Plan;
 import com.redhat.syseng.openshift.service.broker.model.amp.Proxy;
 import com.redhat.syseng.openshift.service.broker.model.amp.Service;
 import com.redhat.syseng.openshift.service.broker.model.amp.Services;
+import com.redhat.syseng.openshift.service.broker.model.service.MappingRulesParameters;
 //import com.redhat.syseng.openshift.service.broker.persistence.PersistHashMapDAO;
 import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
 
@@ -166,28 +166,29 @@ public class BrokerUtil {
 
         logger.info("metricId : " + metricId);
 
-        HashMap parameters = new HashMap();
-        parameters.put("pattern", "/");
-        parameters.put("delta", "1");
-        parameters.put("metric_id", metricId);
-        parameters.put("http_method", "POST");
 
-        MappingRule rule = getThreeScaleApiService().createMappingRules(serviceId, parameters);
+        MappingRulesParameters mp = new MappingRulesParameters();
+        mp.setPattern("/");
+        mp.setDelta("1");
+        mp.setMetric_id(metricId);
+        mp.setHttp_method("POST");
+
+        MappingRule rule = getThreeScaleApiService().createMappingRules(serviceId, mp);
         logger.info("creating mapping result : " + rule.getHttpMethod());
 
         //now create mapping rule for PUT under metric "hit"
-        parameters.put("http_method", "PUT");
-        rule = getThreeScaleApiService().createMappingRules(serviceId, parameters);
+        mp.setHttp_method("PUT");
+        rule = getThreeScaleApiService().createMappingRules(serviceId, mp);
         logger.info("creating mapping result : " + rule.getHttpMethod());
 
         //now create mapping rule for PATCH under metric "hit"
-        parameters.put("http_method", "PATCH");
-        rule = getThreeScaleApiService().createMappingRules(serviceId, parameters);
+        mp.setHttp_method("PATCH");
+        rule = getThreeScaleApiService().createMappingRules(serviceId, mp);
         logger.info("creating mapping result : " + rule.getHttpMethod());
 
         //now create mapping rule for DELETE under metric "hit"
-        parameters.put("http_method", "DELETE");
-        rule = getThreeScaleApiService().createMappingRules(serviceId, parameters);
+        mp.setHttp_method("DELETE");
+        rule = getThreeScaleApiService().createMappingRules(serviceId, mp);
         logger.info("creating mapping result : " + rule.getHttpMethod());
 
     }

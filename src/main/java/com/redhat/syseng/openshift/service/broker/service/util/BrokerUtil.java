@@ -7,7 +7,6 @@ package com.redhat.syseng.openshift.service.broker.service.util;
 
 import java.io.StringWriter;
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.logging.Logger;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.TextUtils;
@@ -27,6 +26,21 @@ import com.redhat.syseng.openshift.service.broker.model.amp.Services;
 import com.redhat.syseng.openshift.service.broker.model.service.MappingRulesParameters;
 //import com.redhat.syseng.openshift.service.broker.persistence.PersistHashMapDAO;
 import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.CertificateNotYetValidException;
+import java.util.logging.Level;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 /**
  * @author czhu
@@ -41,7 +55,7 @@ public class BrokerUtil {
         //TODO: remove hard-coded
         String trustAllCertificates = System.getenv("TRUST_ALL_CERTIFICATES");
         if (null == trustAllCertificates) {
-            trustAllCertificates = "true";
+            trustAllCertificates = "false";
             logger.warning("!!!!!!!!!!!!hard-coded value for TRUST_ALL_CERTIFICATES: " + trustAllCertificates);
         }
         if ("true".equalsIgnoreCase(trustAllCertificates)) {
@@ -50,8 +64,65 @@ public class BrokerUtil {
 //            ApacheHttpClient4Engine engine = new ApacheHttpClient4Engine(createAllTrustingClient());
 //            client = new ResteasyClientBuilder().httpEngine(engine).build();
             client = new ResteasyClientBuilder().disableTrustManager().build();
-        } else {
+        } else if ("no".equalsIgnoreCase(trustAllCertificates)) {
             client = new ResteasyClientBuilder().build();
+        } else if ("false".equalsIgnoreCase(trustAllCertificates)){
+            FileInputStream in = null;
+            try {
+                //in = new FileInputStream("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt");
+                //in = new FileInputStream("/home/czhu/works/openServiceBroker/middleware.ocp.cloud.lab.eng.bos.redhat.com.crt");
+                //in = new FileInputStream("/home/czhu/works/openServiceBroker/rsaebs.corp.redhat.com.crt");
+                in = new FileInputStream("/home/czhu/works/openServiceBroker/mojo.redhat.com.crt");
+
+                CertificateFactory cf = CertificateFactory.getInstance("X.509");
+                Certificate cert = cf.generateCertificate(in);
+                logger.info("createRestClientAcceptsUntrustedCerts, created Certificate from mojo.redhat.com.crt");
+
+                // load the keystore that includes self-signed cert as a "trusted" entry
+                KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+                keyStore.load(null, null);
+                TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                keyStore.setCertificateEntry("ocp-cert", cert);
+                tmf.init(keyStore);
+                SSLContext ctx = SSLContext.getInstance("TLS");
+                ctx.init(null, tmf.getTrustManagers(), null);
+                logger.info("createRestClientAcceptsUntrustedCerts, created SSLContext");
+
+                //For proper HTTPS authentication
+                ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder();
+                clientBuilder.sslContext(ctx);
+                client = clientBuilder.build();
+
+                try {
+                    if (in != null) {
+                        in.close();
+                    }
+                } catch (IOException ex) {
+                    Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+                }
+
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CertificateExpiredException ex) {
+                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CertificateNotYetValidException ex) {
+                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CertificateException ex) {
+                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (KeyStoreException ex) {
+                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchAlgorithmException ex) {
+                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (KeyManagementException ex) {
+                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            //use filter to add http header
+            RestClientRequestFilter filter = new RestClientRequestFilter();
+            client.register(filter);
+
         }
         return client;
     }
@@ -165,7 +236,6 @@ public class BrokerUtil {
         }
 
         logger.info("metricId : " + metricId);
-
 
         MappingRulesParameters mp = new MappingRulesParameters();
         mp.setPattern("/");

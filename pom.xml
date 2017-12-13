@@ -13,7 +13,7 @@
     <description>Service Broker to expose 3scale and its published services to OpenShift catalog</description>
 
     <properties>
-        <version.wildfly.swarm>2017.11.0</version.wildfly.swarm>
+        <version.wildfly.swarm>7.0.0.redhat-8</version.wildfly.swarm>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <failOnMissingWebXml>false</failOnMissingWebXml>
@@ -27,7 +27,7 @@
         <dependencies>
             <dependency>
                 <groupId>org.wildfly.swarm</groupId>
-                <artifactId>bom-all</artifactId>
+                <artifactId>bom</artifactId>
                 <version>${version.wildfly.swarm}</version>
                 <scope>import</scope>
                 <type>pom</type>
@@ -75,7 +75,7 @@
         <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-client</artifactId>
-            <version>3.0.19.Final</version>
+            <version>3.0.19.SP4-redhat-1</version>
             <scope>provided</scope>
         </dependency>
 
@@ -143,4 +143,19 @@
             </build>
         </profile>
     </profiles>
+
+    <repositories>
+        <repository>
+            <id>redhat-ga-repository</id>
+            <name>Redhat GA Repository</name>
+            <url>https://maven.repository.redhat.com/ga/all/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>redhat-ga-repository</id>
+            <name>Redhat GA Repository</name>
+            <url>https://maven.repository.redhat.com/ga/all/</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>

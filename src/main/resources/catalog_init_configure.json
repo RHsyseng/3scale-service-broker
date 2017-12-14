@@ -38,19 +38,25 @@
                 "amp_address": {
                   "title": "3scale AMP admin Address",
                   "type": "string",
-                  "default": "amp-admin"
+                  "default": "3scale-admin.middleware.ocp.cloud.lab.eng.bos.redhat.com"
                 },
                 "account_id": {
                   "title": "3scale AMP account group id",
                   "type": "string",
                   "default": "4"
+                },
+                "use_OCP_certification": {
+                  "title": "use OpenShift pod certification for https",
+                  "type": "boolean",
+                  "default": "true"
                 }
               },
               "required": [
                 "configuration_name",
                 "access_token",
                 "amp_address",
-                "account_id"
+                "account_id", 
+                "use_OCP_certification"
               ],
               "type": "object"
             }

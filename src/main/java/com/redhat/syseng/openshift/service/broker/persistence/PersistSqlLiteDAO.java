@@ -25,6 +25,8 @@ public class PersistSqlLiteDAO {
     private String accountId;
 
     private Boolean loadSecuredMarket;
+    
+    private String useOcpCertification;
 
     private final String SQLITE_DB_URL = "jdbc:sqlite:/tmp/persistency.db";
 
@@ -74,6 +76,18 @@ public class PersistSqlLiteDAO {
         }
         return accountId;
     }
+    
+    public String getUseOcpCertification() {
+        if (useOcpCertification == null || useOcpCertification.equals("")) {
+            readAmpConfiguration();
+        }        
+        return useOcpCertification;
+    }
+
+    public void setUseOcpCertification(String useOcpCertification) {
+        this.useOcpCertification = useOcpCertification;
+    }
+    
 
     private void readAmpConfiguration() {
         Connection connection = null;
@@ -96,6 +110,7 @@ public class PersistSqlLiteDAO {
                 ampAdminAddress = rs.getString("admin_address");
                 accessToken = rs.getString("access_token");
                 accountId = rs.getString("account_id");
+                useOcpCertification = rs.getString("use_ocp_certification");
                 //logger.info("ampAdminAddress = " + ampAdminAddress);
                 //logger.info("accessToken = " + accessToken);
                 //logger.info("accountId = " + accountId);
@@ -108,7 +123,7 @@ public class PersistSqlLiteDAO {
         }
     }
 
-    public void persistAmpConfiguration(String instanceId, String ampAdminAddress, String accessToken, String configurationName, String accountId) {
+    public void persistAmpConfiguration(String instanceId, String ampAdminAddress, String accessToken, String configurationName, String accountId, String useOcpCertification) {
 
         Connection connection = null;
         Statement stmt = null;
@@ -121,8 +136,8 @@ public class PersistSqlLiteDAO {
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS CONFIGURATION_TABLE (instance_id TEXT PRIMARY KEY, configuration_name TEXT,  admin_address TEXT, access_token TEXT, account_id TEXT);");
-            String sqlString = "insert into CONFIGURATION_TABLE values(\"" + instanceId + "\",\"" + configurationName + "\",\"" + ampAdminAddress + "\",\"" + accessToken + "\",\"" + accountId + "\");";
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS CONFIGURATION_TABLE (instance_id TEXT PRIMARY KEY, configuration_name TEXT,  admin_address TEXT, access_token TEXT, account_id TEXT, use_ocp_certification TEXT);");
+            String sqlString = "insert into CONFIGURATION_TABLE values(\"" + instanceId + "\",\"" + configurationName + "\",\"" + ampAdminAddress + "\",\"" + accessToken + "\",\"" + accountId + "\",\"" + useOcpCertification+ "\");";
             logger.info("insert string: " + sqlString);
             stmt.executeUpdate(sqlString);
             //connection.commit();
@@ -454,8 +469,8 @@ public class PersistSqlLiteDAO {
         System.out.println("--retrieveBindingInfo: " + dao.retrieveBindingInfo("instance1"));
         System.out.println();
         
-        dao.persistAmpConfiguration("instance1","http://test.com", "123456", "testConfiguration", "5");
-        dao.persistAmpConfiguration("instance2","http://test1.com", "555555", "testConfiguration2", "6");
+        dao.persistAmpConfiguration("instance1","http://test.com", "123456", "testConfiguration", "5","true");
+        dao.persistAmpConfiguration("instance2","http://test1.com", "555555", "testConfiguration2", "6","false");
         System.out.println("--getAccessToken: " + dao.getAccessToken());
         System.out.println("--getAmpAdminAddress: " + dao.getAmpAdminAddress());
         System.out.println("--getAccountId: " + dao.getAccountId());

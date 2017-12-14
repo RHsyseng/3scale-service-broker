@@ -30,8 +30,6 @@ import com.redhat.syseng.openshift.service.broker.model.catalog.Service;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
 import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
-import java.util.logging.Level;
-import javax.ws.rs.FormParam;
 
 @Path("/v2")
 public class ThreeScaleBroker {
@@ -94,8 +92,10 @@ public class ThreeScaleBroker {
             String accessToken = (String) parameters.get("access_token");
             String configurationName = (String) parameters.get("configuration_name");
             String accountId = (String) parameters.get("account_id");
+            String useOcpCertification = ((Boolean)parameters.get("use_OCP_certification")).toString();
+            logger.info("----- Provisioning useOcpCertification: " + useOcpCertification );
             
-            persistence.persistAmpConfiguration(instance_id, ampAddress, accessToken, configurationName, accountId);
+            persistence.persistAmpConfiguration(instance_id, ampAddress, accessToken, configurationName, accountId, useOcpCertification);
             result = new Result("task_10", null, null);
         } else {
             result = new SecuredMarket().provision(instance_id, provision);

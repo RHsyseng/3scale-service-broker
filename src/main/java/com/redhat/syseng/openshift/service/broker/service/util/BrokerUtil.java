@@ -24,7 +24,6 @@ import com.redhat.syseng.openshift.service.broker.model.amp.Proxy;
 import com.redhat.syseng.openshift.service.broker.model.amp.Service;
 import com.redhat.syseng.openshift.service.broker.model.amp.Services;
 import com.redhat.syseng.openshift.service.broker.model.service.MappingRulesParameters;
-//import com.redhat.syseng.openshift.service.broker.persistence.PersistHashMapDAO;
 import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -49,34 +48,26 @@ public class BrokerUtil {
 
     private static Logger logger = Logger.getLogger(BrokerUtil.class.getName());
 
-    private static ResteasyClient createRestClientAcceptsUntrustedCerts() {
+    private static ResteasyClient createRestClientWithCerts() {
         ResteasyClient client = null;
 
-        //TODO: remove hard-coded
-        String trustAllCertificates = System.getenv("TRUST_ALL_CERTIFICATES");
-        if (null == trustAllCertificates) {
-            trustAllCertificates = "false";
-            logger.warning("!!!!!!!!!!!!hard-coded value for TRUST_ALL_CERTIFICATES: " + trustAllCertificates);
-        }
-        if ("true".equalsIgnoreCase(trustAllCertificates)) {
-            logger.warning("Allow all certificates. Not for production!");
-//            ApacheHttpClient4Engine engine = new ApacheHttpClient4Engine(createHttpClient_AcceptsUntrustedCerts());
-//            ApacheHttpClient4Engine engine = new ApacheHttpClient4Engine(createAllTrustingClient());
-//            client = new ResteasyClientBuilder().httpEngine(engine).build();
-            client = new ResteasyClientBuilder().disableTrustManager().build();
-        } else if ("no".equalsIgnoreCase(trustAllCertificates)) {
+        PersistSqlLiteDAO dao = PersistSqlLiteDAO.getInstance();
+        Boolean useOcpCertification = Boolean.valueOf(dao.getUseOcpCertification());
+
+        if (!useOcpCertification) {
             client = new ResteasyClientBuilder().build();
-        } else if ("false".equalsIgnoreCase(trustAllCertificates)){
+        } else {
+            //use the OCP certificate which exist here in every pod: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             FileInputStream in = null;
             try {
-                //in = new FileInputStream("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt");
+                in = new FileInputStream("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt");
                 //in = new FileInputStream("/home/czhu/works/openServiceBroker/middleware.ocp.cloud.lab.eng.bos.redhat.com.crt");
                 //in = new FileInputStream("/home/czhu/works/openServiceBroker/rsaebs.corp.redhat.com.crt");
-                in = new FileInputStream("/home/czhu/works/openServiceBroker/mojo.redhat.com.crt");
+                //in = new FileInputStream("/home/czhu/works/openServiceBroker/mojo.redhat.com.crt");
 
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
                 Certificate cert = cf.generateCertificate(in);
-                logger.info("createRestClientAcceptsUntrustedCerts, created Certificate from mojo.redhat.com.crt");
+                //logger.info("createRestClientWithCerts, created Certificate from /var/run/secrets/kubernetes.io/serviceaccount/ca.crt");
 
                 // load the keystore that includes self-signed cert as a "trusted" entry
                 KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
@@ -86,7 +77,7 @@ public class BrokerUtil {
                 tmf.init(keyStore);
                 SSLContext ctx = SSLContext.getInstance("TLS");
                 ctx.init(null, tmf.getTrustManagers(), null);
-                logger.info("createRestClientAcceptsUntrustedCerts, created SSLContext");
+                //logger.info("createRestClientWithCerts, created SSLContext");
 
                 //For proper HTTPS authentication
                 ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder();
@@ -128,7 +119,7 @@ public class BrokerUtil {
     }
 
     public static ThreeScaleApiService getThreeScaleApiService() throws URISyntaxException {
-        ResteasyClient client = createRestClientAcceptsUntrustedCerts();
+        ResteasyClient client = createRestClientWithCerts();
 
         URIBuilder uriBuilder = getUriBuilder();
         String url = uriBuilder.build().toString();

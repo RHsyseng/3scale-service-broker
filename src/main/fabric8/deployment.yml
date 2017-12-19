@@ -1,0 +1,17 @@
+spec:
+  replicas: 1
+  template:
+    spec:
+      containers:
+      - env:          
+        resources:
+          limits:
+            memory: '400Mi'
+        volumeMounts:
+        - mountPath: /var/lib/sqlite/data
+          name: 3scale-sqlite
+      volumes:
+      - name: 3scale-sqlite
+        persistentVolumeClaim:
+          claimName: 3scale-sqlite
+

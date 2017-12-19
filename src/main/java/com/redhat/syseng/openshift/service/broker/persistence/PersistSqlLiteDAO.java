@@ -28,7 +28,7 @@ public class PersistSqlLiteDAO {
     
     private String useOcpCertification;
 
-    private final String SQLITE_DB_URL = "jdbc:sqlite:/tmp/persistency.db";
+    private final String SQLITE_DB_URL = "jdbc:sqlite:/var/lib/sqlite/data/persistency.db";
 
     private static Logger logger = Logger.getLogger(PersistSqlLiteDAO.class.getName());
 

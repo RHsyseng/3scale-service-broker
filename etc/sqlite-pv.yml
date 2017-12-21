@@ -1,0 +1,18 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: 3scale-sqlite
+spec:
+  capacity:
+    storage: 100Mi
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle
+  nfs:
+    path: "/mnt/3scale/sqlite"
+    server: 10.19.137.31
+claimRef:
+  namespace: 3scale
+  name: sqlite-storage
+

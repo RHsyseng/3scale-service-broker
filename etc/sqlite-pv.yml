@@ -13,6 +13,6 @@ spec:
     path: "/mnt/3scale/sqlite"
     server: 10.19.137.31
 claimRef:
-  namespace: 3scale
-  name: sqlite-storage
+  namespace: 3scale-service-broker
+  name: 3scale-sqlite
 

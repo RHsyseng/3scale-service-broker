@@ -23,7 +23,7 @@ node {
         echo "listServiceReply: ${listServiceReply}"  
         
 
-        def ReadIdHelper = load("ReadIdHelper.groovy")
+        def ReadIdHelper = load("src/main/resources/ReadIdHelper.groovy")
         
         //just get 1 service id
         def serviceId = Integer.parseInt(ReadIdHelper.getServiceId2(listServiceReply))
@@ -59,7 +59,7 @@ node {
         def createServiceReply = new File("${WORKSPACE}/out_createService.txt").text
         echo "createServiceReply: ${createServiceReply}"
 
-        def ReadIdHelper = load("ReadIdHelper.groovy")
+        def ReadIdHelper = load("src/main/resources/ReadIdHelper.groovy")
         def serviceId = ReadIdHelper.getServiceId(createServiceReply)
         echo "serviceId ${serviceId}"
 
@@ -109,7 +109,7 @@ node {
         def createServiceReply = new File("${WORKSPACE}/out_createService.txt").text
         echo "createServiceReply: ${createServiceReply}"
 
-        def ReadIdHelper = load("ReadIdHelper.groovy")
+        def ReadIdHelper = load("src/main/resources/ReadIdHelper.groovy")
         def serviceId = ReadIdHelper.getServiceId(createServiceReply)
         echo "serviceId ${serviceId}"
 
@@ -152,7 +152,7 @@ node {
         def createServiceReply = new File("${WORKSPACE}/out_createService.txt").text
         echo "createServiceReply: ${createServiceReply}"
 
-        def ReadIdHelper = load("ReadIdHelper.groovy")
+        def ReadIdHelper = load("src/main/resources/ReadIdHelper.groovy")
         def serviceId = ReadIdHelper.getServiceId(createServiceReply)
         echo "serviceId ${serviceId}"
 

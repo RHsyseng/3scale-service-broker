@@ -5,8 +5,8 @@ node {
     def accessToken = "55044249b6efeaa6ff383df3ac3709824ba51f79438ef5aa57b134e381120c78"
     def ampURL = ""
     def serviceCurl = ""
-        def OC_HOME = "/home/czhu/works/ocClient"    
-    /*
+    def OC_HOME = "/home/czhu/works/ocClient"    
+    
     stage ('clean services') {
     // Git checkout before load source the file
     checkout scm
@@ -182,7 +182,7 @@ node {
     sh "${serviceCurl}"  
      
     }
-     */
+    
     
     stage ('Build and Deploy') {
         

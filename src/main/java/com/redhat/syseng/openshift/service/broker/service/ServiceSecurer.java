@@ -4,12 +4,16 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
+
+import com.redhat.syseng.openshift.service.broker.model.amp.Application;
 import com.redhat.syseng.openshift.service.broker.model.amp.Plan;
 import com.redhat.syseng.openshift.service.broker.model.amp.Proxy;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
 import com.redhat.syseng.openshift.service.broker.model.service.ServiceParameters;
-import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
+import com.redhat.syseng.openshift.service.broker.persistence.Persistence;
+import com.redhat.syseng.openshift.service.broker.persistence.PlatformConfig;
+
 import static com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil.createMappingRules;
 import static com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil.getThreeScaleApiService;
 import static com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil.searchServiceInstance;
@@ -31,7 +35,7 @@ public class ServiceSecurer {
         logger.info("provision.getParameters().getInput_url() : " + (String) inputParameters.get("input_url"));
         logger.info("provision.getParameters().getApplication_name() : " + (String) inputParameters.get("application_name"));
 
-        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String url = searchServiceInstance((String) inputParameters.get("service_name"));
 
         String newServiceId = "";
@@ -79,7 +83,7 @@ public class ServiceSecurer {
             sp.setPlan_id(String.valueOf(plan.getId()));
 
             //after this step, in the API Integration page, the user_key will automatically replaced with the new one created below
-            com.redhat.syseng.openshift.service.broker.model.amp.Application application = getThreeScaleApiService().createApplication(persistence.getAccountId(), sp);
+            Application application = getThreeScaleApiService().createApplication(platformConfig.getAccountId(), sp);
 
             logger.info("---------------------application is created : " + application.getName());
             logger.info("user_key : " + application.getUserKey());
@@ -119,7 +123,7 @@ public class ServiceSecurer {
         parameters.put("password", password);
         parameters.put("email", email);
 
-        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        Persistence persistence = Persistence.getInstance();
         User user = getThreeScaleApiService().createUser(persistence.getAccountId(), parameters);
         logger.info("user is created  : " + user.getId());
 
@@ -132,7 +136,7 @@ public class ServiceSecurer {
 */
 
     public void deProvisioning(String instanceId) throws URISyntaxException {
-        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        Persistence persistence = Persistence.getInstance();
         String provisionInfo = persistence.retrieveProvisionInfo(instanceId);
         if (null != provisionInfo && !"".equals(provisionInfo)) {
             String serviceId = provisionInfo.substring(provisionInfo.indexOf("service_id='") + "service_id='".length(), provisionInfo.indexOf("', organization_guid"));

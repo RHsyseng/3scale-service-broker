@@ -27,7 +27,8 @@ import com.redhat.syseng.openshift.service.broker.model.catalog.ServiceInstance;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
 import com.redhat.syseng.openshift.service.broker.model.service.ServiceParameters;
-import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
+import com.redhat.syseng.openshift.service.broker.persistence.Persistence;
+import com.redhat.syseng.openshift.service.broker.persistence.PlatformConfig;
 import com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil;
 
 import static com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil.getThreeScaleApiService;
@@ -46,10 +47,10 @@ public class SecuredMarket {
         logger.info("provision.getParameters().getApplicationName() : " + (String) inputParameters.get("applicationName"));
         logger.info("provision.getParameters().getDescription() : " + (String) inputParameters.get("description"));
         
-        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String applicationId = "";
         
-        String userKey = BrokerUtil.searchExistingApplicationBaseOnName((String) inputParameters.get("applicationName"), persistence.getAccountId());
+        String userKey = BrokerUtil.searchExistingApplicationBaseOnName((String) inputParameters.get("applicationName"), platformConfig.getAccountId());
         
         if (userKey.equals("")) {
             //create new Application to use the Plan, which will generate a new user_key
@@ -60,7 +61,7 @@ public class SecuredMarket {
             sp.setPlan_id(provision.getPlan_id());
                         
             //after this step, in the API Integration page, the user_key will automatically replaced with the new one created below
-            com.redhat.syseng.openshift.service.broker.model.amp.Application application = getThreeScaleApiService().createApplication(String.valueOf(persistence.getAccountId()), sp);
+            com.redhat.syseng.openshift.service.broker.model.amp.Application application = getThreeScaleApiService().createApplication(String.valueOf(platformConfig.getAccountId()), sp);
             logger.info("---------------------application is created, id is : " + application.getId());
             applicationId = String.valueOf(application.getId());
             
@@ -171,7 +172,7 @@ public class SecuredMarket {
         String serviceId = inputStr.substring(inputStr.indexOf("service_id\":\"") + "service_id\":\"".length(), inputStr.indexOf("\",\"bind_resource"));
         logger.info("binding serviceId: " + serviceId);
 
-        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        Persistence persistence = Persistence.getInstance();
         String endpoint = BrokerUtil.searchEndPointBasedOnServiceId(serviceId);
         if (endpoint == null) {
             Error error = new Error(410, "Service ID " + serviceId + " not found!");
@@ -193,14 +194,14 @@ public class SecuredMarket {
         String serviceId = binding.getService_id();
         logger.info("binding serviceId: " + serviceId);
         
-        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String endpoint = BrokerUtil.searchEndPointBasedOnServiceId(serviceId);
         if (endpoint == null) {
             Error error = new Error(410, "Service ID " + serviceId + " not found!");
             logger.severe("Failed to bind\n" + error);
             throw error.asException();
         } else {
-            String user_key = BrokerUtil.searchUserKeyBasedOnServiceAndPlanId(serviceId, planId, persistence.getAccountId());
+            String user_key = BrokerUtil.searchUserKeyBasedOnServiceAndPlanId(serviceId, planId, platformConfig.getAccountId());
             BindingResult result = new BindingResult(new BindingResult.Credentials(endpoint, user_key));
             logger.info("binding result:  " + result);
             return result;
@@ -208,7 +209,8 @@ public class SecuredMarket {
     }
     
     public void deProvisioning(String instanceId) throws URISyntaxException {
-        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
+        Persistence persistence = Persistence.getInstance();
+        PlatformConfig platformConfig = persistence.getPlatformConfig();
         String provisionInfo = persistence.retrieveProvisionInfo(instanceId);
         if (null != provisionInfo && !"".equals(provisionInfo)) {
             //logger.info("SecuredMarket.deProvisioning(), provisionInfo: " + provisionInfo);
@@ -217,7 +219,7 @@ public class SecuredMarket {
             String applicationId = provisionInfo.substring(i + "applicationId=".length(), provisionInfo.indexOf("}", i));
             if (null != applicationId && !"".equals(applicationId)) {
                 logger.info("SecuredMarket.deProvisioning(), applicationId: " + applicationId);
-                getThreeScaleApiService().deleteApplication(persistence.getAccountId(), applicationId);
+                getThreeScaleApiService().deleteApplication(platformConfig.getAccountId(), applicationId);
             }
         }
     }

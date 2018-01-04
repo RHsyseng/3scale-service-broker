@@ -8,6 +8,9 @@ package com.redhat.syseng.openshift.service.broker.service.util;
 import java.io.StringWriter;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
+
+import com.redhat.syseng.openshift.service.broker.persistence.Persistence;
+import com.redhat.syseng.openshift.service.broker.persistence.PlatformConfig;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.util.TextUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -24,7 +27,7 @@ import com.redhat.syseng.openshift.service.broker.model.amp.Proxy;
 import com.redhat.syseng.openshift.service.broker.model.amp.Service;
 import com.redhat.syseng.openshift.service.broker.model.amp.Services;
 import com.redhat.syseng.openshift.service.broker.model.service.MappingRulesParameters;
-import com.redhat.syseng.openshift.service.broker.persistence.PersistSqlLiteDAO;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -48,15 +51,10 @@ public class BrokerUtil {
 
     private static Logger logger = Logger.getLogger(BrokerUtil.class.getName());
 
-    private static ResteasyClient createRestClientWithCerts() {
+    private static ResteasyClient createRestClientWithCerts(boolean useOcpCertificate) {
         ResteasyClient client = null;
 
-        PersistSqlLiteDAO dao = PersistSqlLiteDAO.getInstance();
-        Boolean useOcpCertification = Boolean.valueOf(dao.getUseOcpCertification());
-
-        if (!useOcpCertification) {
-            client = new ResteasyClientBuilder().build();
-        } else {
+        if (useOcpCertificate) {
             //use the OCP certificate which exist here in every pod: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
             FileInputStream in = null;
             try {
@@ -113,13 +111,21 @@ public class BrokerUtil {
             //use filter to add http header
             RestClientRequestFilter filter = new RestClientRequestFilter();
             client.register(filter);
-
+        } else {
+            client = new ResteasyClientBuilder().build();
         }
         return client;
     }
 
     public static ThreeScaleApiService getThreeScaleApiService() throws URISyntaxException {
-        ResteasyClient client = createRestClientWithCerts();
+        boolean useOcpCertificate;
+        PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
+        if( platformConfig == null ){
+            useOcpCertificate = false;
+        } else {
+            useOcpCertificate = platformConfig.isUseOcpCertificate();
+        }
+        ResteasyClient client = createRestClientWithCerts(useOcpCertificate);
 
         URIBuilder uriBuilder = getUriBuilder();
         String url = uriBuilder.build().toString();
@@ -128,16 +134,15 @@ public class BrokerUtil {
     }
 
     private static URIBuilder getUriBuilder(Object... path) {
-        PersistSqlLiteDAO persistence = PersistSqlLiteDAO.getInstance();
-        logger.info("accessToken: " + persistence.getAccessToken());
-        logger.info("ampAddress: " + persistence.getAmpAdminAddress());
+        PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
+        logger.info(String.valueOf(platformConfig));
 
         URIBuilder uriBuilder = new URIBuilder();
         uriBuilder.setScheme("https");
-        uriBuilder.setHost(persistence.getAmpAdminAddress());
+        uriBuilder.setHost(platformConfig.getAdminAddress());
 
         uriBuilder.setPort(443);
-        uriBuilder.addParameter("access_token", persistence.getAccessToken());
+        uriBuilder.addParameter("access_token", platformConfig.getAccessToken());
 
         StringWriter stringWriter = new StringWriter();
         for (Object part : path) {

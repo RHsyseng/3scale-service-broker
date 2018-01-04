@@ -7,7 +7,7 @@ node {
     def serviceCurl = ""
     def OC_HOME = "/home/czhu/works/ocClient"    
     
-    stage ('clean services') {
+    stage ('clean 3scale services') {
     // Git checkout before load source the file
     checkout scm
     // To know files are checked out or not
@@ -47,7 +47,7 @@ node {
     }
     
     
-    stage ('create service1') {
+    stage ('create 3scale service1') {
     println("create service ----------------------------------")
     def serviceName = "printPhoto"
     ampURL = "\"https://3scale-admin.middleware.ocp.cloud.lab.eng.bos.redhat.com/admin/api/services.xml\""
@@ -97,7 +97,7 @@ node {
      
     }
     
-    stage ('create service2') {
+    stage ('create 3scale service2') {
     println("create service ----------------------------------")
     def serviceName = "buyTicket"
     ampURL = "\"https://3scale-admin.middleware.ocp.cloud.lab.eng.bos.redhat.com/admin/api/services.xml\""
@@ -140,7 +140,7 @@ node {
      
     }
     
-    stage ('create service3') {
+    stage ('create 3scale service3') {
     println("create service ----------------------------------")
     def serviceName = "orderPizza"
     ampURL = "\"https://3scale-admin.middleware.ocp.cloud.lab.eng.bos.redhat.com/admin/api/services.xml\""
@@ -184,7 +184,7 @@ node {
     }
     
     
-    stage ('Build and Deploy') {
+    stage ('OCP Build and Deploy') {
         
         //delete the old three-scale application first
         withEnv(["PATH+OC=${OC_HOME}"]) {

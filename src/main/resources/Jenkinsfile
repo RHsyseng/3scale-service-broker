@@ -185,6 +185,7 @@ node {
     */
     
     stage ('Build') {
+        sh "oc delete all -l app=three-scale  --grace-period=0"
 
         withMaven(
             // Maven installation declared in the Jenkins "Global Tool Configuration"

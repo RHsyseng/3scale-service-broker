@@ -219,6 +219,43 @@ public class Persistence {
 
     }
 
+    public boolean isProvisionInfoExist(String instanceId) {
+
+        Connection connection = null;
+        Statement stmt = null;
+        boolean result = false;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection(SQLITE_DB_URL);
+            //logger.info("Opened database successfully");
+
+            stmt = connection.createStatement();
+            stmt.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            String sqlString = "SELECT provision_info FROM PROVISION_TABLE where instance_id = \"" + instanceId + "\";";
+            //logger.info("sqlString: " + sqlString);
+
+            ResultSet rs = stmt.executeQuery(sqlString);
+
+            while (rs.next()) {
+                result = true;
+            }
+            rs.close();
+            stmt.close();
+            connection.close();
+        } catch (Exception e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+            /*no need to do the judge below, since if the table is not there, of course the info doesn't exist
+            if (e.getMessage().contains("no such table: PROVISION_TABLE")) {
+                //This is normal, because 1st time read the sqlite3, the table is not even created. 
+                logger.info("no such table: PROVISION_TABLE, this is the initial stage ");
+                */
+        }
+        //logger.info("isProvisionInfoExist: " + result);
+        return result;
+
+    }    
+
     public void persistBindingInfo(String instanceId, Object bindingInfo) {
 
         Connection connection = null;

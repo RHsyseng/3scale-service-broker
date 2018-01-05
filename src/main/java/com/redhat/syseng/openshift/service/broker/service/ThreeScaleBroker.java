@@ -49,7 +49,7 @@ public class ThreeScaleBroker {
 
         if (persistence.getPlatformConfig() == null) {
             //read the configuration AMP catalog , which is static
-            logger.info("need to read the init catalog" );
+            logger.info("need to read the init catalog");
             Reader catalogReader = new InputStreamReader(getClass().getResourceAsStream("/catalog_init_configure.json"));
             Service configurationService = new ObjectMapper().readValue(catalogReader, Service.class);
             services = new Service[]{configurationService};
@@ -79,36 +79,41 @@ public class ThreeScaleBroker {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public synchronized Result provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException, SQLException, ClassNotFoundException {
         logger.info("Provisioning " + instance_id + " with data " + provision);
-
-        //PersistHashMapDAO persistence = PersistHashMapDAO.getInstance();
         Persistence persistence = Persistence.getInstance();
-        Result result;
-        if (provision.getParameters().containsKey("input_url")) {
+        Result result = new Result("task_10", null, null);
+        
+        //Add this check here because the OCP spawns mulitple threads for same provision, make sure only the 1st one go through
+        if (!persistence.isProvisionInfoExist(instance_id)) {
+            if (provision.getParameters().containsKey("input_url")) {
 
-            result = new ServiceSecurer().provisioningForSecureService(instance_id, provision);
-            provision.setService_id(result.getServiceId());
+                result = new ServiceSecurer().provisioningForSecureService(instance_id, provision);
+                provision.setService_id(result.getServiceId());
 
-        } else if (provision.getParameters().containsKey("access_token")) {
-            //This is the provision to setup the AMP configuration
-            Map<String, Object> parameters = provision.getParameters();
-            PlatformConfig platformConfig = new PlatformConfig();
-            platformConfig.setAdminAddress((String) parameters.get("amp_address"));
-            platformConfig.setAccessToken((String) parameters.get("access_token"));
-            platformConfig.setAccountId((String) parameters.get("account_id"));
-            platformConfig.setUseOcpCertificate(Boolean.valueOf((String)parameters.get("use_OCP_certification")));
-            String configurationName = (String) parameters.get("configuration_name");
-            logger.info(configurationName + ": " + platformConfig);
+            } else if (provision.getParameters().containsKey("access_token")) {
+                //This is the provision to setup the AMP configuration
+                Map<String, Object> parameters = provision.getParameters();
+                PlatformConfig platformConfig = new PlatformConfig();
+                platformConfig.setAdminAddress((String) parameters.get("amp_address"));
+                platformConfig.setAccessToken((String) parameters.get("access_token"));
+                platformConfig.setAccountId((String) parameters.get("account_id"));
+                platformConfig.setUseOcpCertificate(Boolean.valueOf((String) parameters.get("use_OCP_certification")));
+                String configurationName = (String) parameters.get("configuration_name");
+                logger.info(configurationName + ": " + platformConfig);
 
-            persistence.setConfiguration(instance_id, configurationName, platformConfig);
-            result = new Result("task_10", null, null);
-        } else {
-            result = new SecuredMarket().provision(instance_id, provision);
-            Map<String, Object> parameters = provision.getParameters();
-            parameters.put("applicationId", result.getAppliationId());
+                persistence.setConfiguration(instance_id, configurationName, platformConfig);
+
+            } else {
+                result = new SecuredMarket().provision(instance_id, provision);
+                Map<String, Object> parameters = provision.getParameters();
+                parameters.put("applicationId", result.getAppliationId());
+            }
+            persistence.persistProvisionInfo(instance_id, provision);
+            //logger.info("persist provision : " + persistence.retrieveProvisionInfo(instance_id).toString());
+            logger.info("provision.result: " + result);
+
+        }else{
+                logger.info("ProvisionInfo already exists, skip provision again");            
         }
-        persistence.persistProvisionInfo(instance_id, provision);
-        //logger.info("persist provision : " + persistence.retrieveProvisionInfo(instance_id).toString());
-        logger.info("provision.result: " + result);
 
         return result;
     }

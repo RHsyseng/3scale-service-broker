@@ -69,6 +69,8 @@ public class Persistence {
                 platformConfig.setAdminAddress(rs.getString("admin_address"));
                 platformConfig.setAccessToken(rs.getString("access_token"));
                 platformConfig.setAccountId(rs.getString("account_id"));
+                logger.info("rs.getString(\"use_ocp_certification\") " + rs.getString("use_ocp_certification"));                
+                logger.info("rs.getBoolean(\"use_ocp_certification\") " + rs.getBoolean("use_ocp_certification"));                
                 platformConfig.setUseOcpCertificate(rs.getBoolean("use_ocp_certification"));
                 logger.info("Loaded " + platformConfig);
                 return platformConfig;
@@ -97,8 +99,14 @@ public class Persistence {
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
+            //Boolean Datatype. SQLite does not have a separate Boolean storage class. Instead, Boolean values are stored as integers 0 (false) and 1 (true).
+            //without conversion, Java boolean true will be stored as "true", then when retrive using rs.getBoolean, the value will be false.
+            int booleanValueInSqlite = 1;
+            if (!platformConfig.isUseOcpCertificate()) booleanValueInSqlite = 0;
+
+            
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS CONFIGURATION_TABLE (instance_id TEXT PRIMARY KEY, configuration_name TEXT,  admin_address TEXT, access_token TEXT, account_id TEXT, use_ocp_certification TEXT);");
-            String sqlString = "insert into CONFIGURATION_TABLE values(\"" + instanceId + "\",\"" + configurationName + "\",\"" + platformConfig.getAdminAddress() + "\",\"" + platformConfig.getAccessToken() + "\",\"" + platformConfig.getAccountId() + "\",\"" + platformConfig.isUseOcpCertificate() + "\");";
+            String sqlString = "insert into CONFIGURATION_TABLE values(\"" + instanceId + "\",\"" + configurationName + "\",\"" + platformConfig.getAdminAddress() + "\",\"" + platformConfig.getAccessToken() + "\",\"" + platformConfig.getAccountId() + "\",\"" + booleanValueInSqlite + "\");";
             logger.info("insert string: " + sqlString);
             stmt.executeUpdate(sqlString);
         }

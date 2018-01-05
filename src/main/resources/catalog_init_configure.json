@@ -47,8 +47,7 @@
                 },
                 "use_OCP_certification": {
                   "title": "use OpenShift pod certification for https",
-                  "type": "boolean",
-                  "default": "true"
+                  "type": "boolean"
                 }
               },
               "required": [

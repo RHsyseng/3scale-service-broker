@@ -96,7 +96,7 @@ public class ThreeScaleBroker {
                 platformConfig.setAdminAddress((String) parameters.get("amp_address"));
                 platformConfig.setAccessToken((String) parameters.get("access_token"));
                 platformConfig.setAccountId((String) parameters.get("account_id"));
-                platformConfig.setUseOcpCertificate(Boolean.valueOf((String) parameters.get("use_OCP_certification")));
+                platformConfig.setUseOcpCertificate((Boolean) parameters.get("use_OCP_certification"));
                 String configurationName = (String) parameters.get("configuration_name");
                 logger.info(configurationName + ": " + platformConfig);
 

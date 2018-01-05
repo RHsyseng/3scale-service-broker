@@ -42,7 +42,8 @@ public class Persistence {
     }
 
     public PlatformConfig getPlatformConfig() {
-        if(!persistenceLoaded){
+        logger.info("getPlatformConfig " + persistenceLoaded);
+        if (!persistenceLoaded) {
             platformConfig = readPlatformConfig();
         }
         return platformConfig;
@@ -55,16 +56,15 @@ public class Persistence {
             throw new IllegalStateException("Failed to load SQLite driver");
         }
         try (Connection connection = DriverManager.getConnection(SQLITE_DB_URL)) {
-
             Statement stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
             //TODO: later, we might need to select configuration based on name, for now just retrieve one record.
             String sqlString = "SELECT * FROM CONFIGURATION_TABLE;";
-
             ResultSet rs = stmt.executeQuery(sqlString);
+
             persistenceLoaded = true;
-            if(rs.next()) {
+            if (rs.next()) {
                 PlatformConfig platformConfig = new PlatformConfig();
                 platformConfig.setAdminAddress(rs.getString("admin_address"));
                 platformConfig.setAccessToken(rs.getString("access_token"));
@@ -73,10 +73,17 @@ public class Persistence {
                 logger.info("Loaded " + platformConfig);
                 return platformConfig;
             } else {
+                logger.info("no configuration to load, this is the initial stage ");
                 return null;
             }
         } catch (SQLException e) {
-            throw new IllegalStateException("Failed to read configuration from SQLite");
+            if (e.getMessage().contains("no such table: CONFIGURATION_TABLE")) {
+                //This is normal, because 1st time read the sqlite3, the table is not even created. 
+                logger.info("no such table: CONFIGURATION_TABLE, and configuration to load, this is the initial stage ");
+                return null;
+            } else {
+                throw new IllegalStateException("Failed to read configuration from SQLite: " + e);
+            }
         }
     }
 
@@ -122,7 +129,6 @@ public class Persistence {
         logger.info("deleteAmpConfiguration" + instanceId);
 
     }
-
 
     public boolean isLoadSecuredMarket() {
         return loadSecuredMarket;
@@ -265,7 +271,6 @@ public class Persistence {
         logger.info("deleteBindingInfo " + instanceId);
 
     }
-
 
     public Object retrieveBindingInfo(String instanceId) {
         Connection connection = null;

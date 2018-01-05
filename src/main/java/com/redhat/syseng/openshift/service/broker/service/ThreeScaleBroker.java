@@ -49,6 +49,7 @@ public class ThreeScaleBroker {
 
         if (persistence.getPlatformConfig() == null) {
             //read the configuration AMP catalog , which is static
+            logger.info("need to read the init catalog" );
             Reader catalogReader = new InputStreamReader(getClass().getResourceAsStream("/catalog_init_configure.json"));
             Service configurationService = new ObjectMapper().readValue(catalogReader, Service.class);
             services = new Service[]{configurationService};

@@ -63,7 +63,6 @@ public class Persistence {
             String sqlString = "SELECT * FROM CONFIGURATION_TABLE;";
             ResultSet rs = stmt.executeQuery(sqlString);
 
-            persistenceLoaded = true;
             if (rs.next()) {
                 PlatformConfig platformConfig = new PlatformConfig();
                 platformConfig.setAdminAddress(rs.getString("admin_address"));
@@ -73,6 +72,7 @@ public class Persistence {
                 logger.info("rs.getBoolean(\"use_ocp_certification\") " + rs.getBoolean("use_ocp_certification"));                
                 platformConfig.setUseOcpCertificate(rs.getBoolean("use_ocp_certification"));
                 logger.info("Loaded " + platformConfig);
+                persistenceLoaded = true;                
                 return platformConfig;
             } else {
                 logger.info("no configuration to load, this is the initial stage ");

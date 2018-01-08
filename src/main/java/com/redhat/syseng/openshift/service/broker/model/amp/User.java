@@ -26,10 +26,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="created_at" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
  *         &lt;element name="updated_at" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
- *         &lt;element name="account_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *         &lt;element name="account_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="state" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="role" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="username" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -57,7 +57,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 })
 public class User {
 
-    protected byte id;
+    protected int id;
     @XmlElement(name = "created_at", required = true)
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar createdAt;
@@ -65,7 +65,7 @@ public class User {
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar updatedAt;
     @XmlElement(name = "account_id")
-    protected byte accountId;
+    protected int accountId;
     @XmlElement(required = true)
     protected String state;
     @XmlElement(required = true)
@@ -81,7 +81,7 @@ public class User {
      * Gets the value of the id property.
      * 
      */
-    public byte getId() {
+    public int getId() {
         return id;
     }
 
@@ -89,7 +89,7 @@ public class User {
      * Sets the value of the id property.
      * 
      */
-    public void setId(byte value) {
+    public void setId(int value) {
         this.id = value;
     }
 
@@ -145,7 +145,7 @@ public class User {
      * Gets the value of the accountId property.
      * 
      */
-    public byte getAccountId() {
+    public int getAccountId() {
         return accountId;
     }
 
@@ -153,7 +153,7 @@ public class User {
      * Sets the value of the accountId property.
      * 
      */
-    public void setAccountId(byte value) {
+    public void setAccountId(int value) {
         this.accountId = value;
     }
 

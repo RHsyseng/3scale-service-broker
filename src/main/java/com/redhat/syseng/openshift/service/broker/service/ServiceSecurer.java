@@ -53,7 +53,6 @@ public class ServiceSecurer {
             sp.setDescription("instance_id:" + instanceId);
             
             com.redhat.syseng.openshift.service.broker.model.amp.Service service = getThreeScaleApiService().createService(sp);
-            logger.info("---------------------services is created : " + service.getName());
             String serviceId = String.valueOf(service.getId());
             logger.info("serviceId : " + serviceId);
             //use the real service id to replace old one from catalog.json, which will be passed back and persist.

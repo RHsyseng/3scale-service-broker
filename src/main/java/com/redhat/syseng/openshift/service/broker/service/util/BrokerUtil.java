@@ -112,7 +112,9 @@ public class BrokerUtil {
             RestClientRequestFilter filter = new RestClientRequestFilter();
             client.register(filter);
         } else {
-            client = new ResteasyClientBuilder().build();
+            //client = new ResteasyClientBuilder().build();
+            //This is for local testing only
+            client = new ResteasyClientBuilder().disableTrustManager().build();
         }
         return client;
     }
@@ -120,7 +122,7 @@ public class BrokerUtil {
     public static ThreeScaleApiService getThreeScaleApiService() throws URISyntaxException {
         boolean useOcpCertificate;
         PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
-        if( platformConfig == null ){
+        if (platformConfig == null) {
             useOcpCertificate = false;
         } else {
             useOcpCertificate = platformConfig.isUseOcpCertificate();
@@ -269,7 +271,8 @@ public class BrokerUtil {
             if (systemName.equals(inputServiceSystemName)) {
                 found = true;
                 String serviceId = String.valueOf(service.getId());
-                logger.info("found same system_name service, id : " + serviceId);
+                logger.info("found same system_name service, id2 : " + service.getId());
+
                 String user_key = searchAnyUserKeyBasedOnServiceId(serviceId);
                 String endpoint = searchEndPointBasedOnServiceId(serviceId);
                 if (TextUtils.isEmpty(endpoint)) {

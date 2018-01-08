@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *         &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="endpoint" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="api_backend" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="credentials_location" type="{http://www.w3.org/2001/XMLSchema}string"/>
@@ -80,7 +80,7 @@ import javax.xml.bind.annotation.XmlType;
 public class Proxy {
 
     @XmlElement(name = "service_id")
-    protected byte serviceId;
+    protected int serviceId;
     @XmlElement(required = true)
     protected String endpoint;
     @XmlElement(name = "api_backend", required = true)
@@ -126,7 +126,7 @@ public class Proxy {
      * Gets the value of the serviceId property.
      * 
      */
-    public byte getServiceId() {
+    public int getServiceId() {
         return serviceId;
     }
 
@@ -134,7 +134,7 @@ public class Proxy {
      * Sets the value of the serviceId property.
      * 
      */
-    public void setServiceId(byte value) {
+    public void setServiceId(int value) {
         this.serviceId = value;
     }
 

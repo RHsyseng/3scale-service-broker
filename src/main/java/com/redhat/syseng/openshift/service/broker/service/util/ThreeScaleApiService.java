@@ -5,12 +5,10 @@
  */
 package com.redhat.syseng.openshift.service.broker.service.util;
 
-import java.util.HashMap;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -22,7 +20,6 @@ import com.redhat.syseng.openshift.service.broker.model.amp.Services;
 import com.redhat.syseng.openshift.service.broker.model.amp.Metrics;
 import com.redhat.syseng.openshift.service.broker.model.amp.Plan;
 import com.redhat.syseng.openshift.service.broker.model.amp.Service;
-import com.redhat.syseng.openshift.service.broker.model.amp.User;
 import com.redhat.syseng.openshift.service.broker.model.amp.Applications;
 import com.redhat.syseng.openshift.service.broker.model.amp.Application;
 import com.redhat.syseng.openshift.service.broker.model.amp.MappingRule;

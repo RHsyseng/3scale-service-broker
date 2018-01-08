@@ -42,7 +42,7 @@ public class Persistence {
     }
 
     public PlatformConfig getPlatformConfig() {
-        logger.info("getPlatformConfig " + persistenceLoaded);
+        //logger.info("getPlatformConfig " + persistenceLoaded);
         if (!persistenceLoaded) {
             platformConfig = readPlatformConfig();
         }

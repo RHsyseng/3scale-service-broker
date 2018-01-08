@@ -30,11 +30,11 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *                   &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *                   &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="system_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="friendly_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                   &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *                   &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *                   &lt;element name="description" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="unit" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                 &lt;/sequence>
@@ -95,11 +95,11 @@ public class Metrics {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+     *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
      *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="system_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="friendly_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *         &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+     *         &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
      *         &lt;element name="description" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="unit" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *       &lt;/sequence>
@@ -122,7 +122,7 @@ public class Metrics {
     })
     public static class Metric {
 
-        protected byte id;
+        protected int id;
         @XmlElement(required = true)
         protected String name;
         @XmlElement(name = "system_name", required = true)
@@ -130,7 +130,7 @@ public class Metrics {
         @XmlElement(name = "friendly_name", required = true)
         protected String friendlyName;
         @XmlElement(name = "service_id")
-        protected byte serviceId;
+        protected int serviceId;
         @XmlElement(required = true)
         protected String description;
         @XmlElement(required = true)
@@ -140,7 +140,7 @@ public class Metrics {
          * Gets the value of the id property.
          * 
          */
-        public byte getId() {
+        public int getId() {
             return id;
         }
 
@@ -148,7 +148,7 @@ public class Metrics {
          * Sets the value of the id property.
          * 
          */
-        public void setId(byte value) {
+        public void setId(int value) {
             this.id = value;
         }
 
@@ -228,7 +228,7 @@ public class Metrics {
          * Gets the value of the serviceId property.
          * 
          */
-        public byte getServiceId() {
+        public int getServiceId() {
             return serviceId;
         }
 
@@ -236,7 +236,7 @@ public class Metrics {
          * Sets the value of the serviceId property.
          * 
          */
-        public void setServiceId(byte value) {
+        public void setServiceId(int value) {
             this.serviceId = value;
         }
 

@@ -26,12 +26,12 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
- *         &lt;element name="account_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="account_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="state" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="system_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="backend_version" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *         &lt;element name="backend_version" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="end_user_registration_required" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="metrics">
  *           &lt;complexType>
@@ -43,11 +43,11 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;sequence>
- *                             &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *                             &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *                             &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                             &lt;element name="system_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                             &lt;element name="friendly_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                             &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *                             &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *                             &lt;element name="description" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                             &lt;element name="unit" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                           &lt;/sequence>
@@ -82,9 +82,9 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "service")
 public class Service {
 
-    protected byte id;
+    protected int id;
     @XmlElement(name = "account_id")
-    protected byte accountId;
+    protected int accountId;
     @XmlElement(required = true)
     protected String name;
     @XmlElement(required = true)
@@ -92,7 +92,7 @@ public class Service {
     @XmlElement(name = "system_name", required = true)
     protected String systemName;
     @XmlElement(name = "backend_version")
-    protected byte backendVersion;
+    protected int backendVersion;
     @XmlElement(name = "end_user_registration_required", required = true)
     protected String endUserRegistrationRequired;
     @XmlElement(required = true)
@@ -102,7 +102,7 @@ public class Service {
      * Gets the value of the id property.
      * 
      */
-    public byte getId() {
+    public int getId() {
         return id;
     }
 
@@ -110,7 +110,7 @@ public class Service {
      * Sets the value of the id property.
      * 
      */
-    public void setId(byte value) {
+    public void setId(int value) {
         this.id = value;
     }
 
@@ -118,7 +118,7 @@ public class Service {
      * Gets the value of the accountId property.
      * 
      */
-    public byte getAccountId() {
+    public int getAccountId() {
         return accountId;
     }
 
@@ -126,7 +126,7 @@ public class Service {
      * Sets the value of the accountId property.
      * 
      */
-    public void setAccountId(byte value) {
+    public void setAccountId(int value) {
         this.accountId = value;
     }
 
@@ -206,7 +206,7 @@ public class Service {
      * Gets the value of the backendVersion property.
      * 
      */
-    public byte getBackendVersion() {
+    public int getBackendVersion() {
         return backendVersion;
     }
 
@@ -214,7 +214,7 @@ public class Service {
      * Sets the value of the backendVersion property.
      * 
      */
-    public void setBackendVersion(byte value) {
+    public void setBackendVersion(int value) {
         this.backendVersion = value;
     }
 
@@ -282,11 +282,11 @@ public class Service {
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;sequence>
-     *                   &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+     *                   &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
      *                   &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                   &lt;element name="system_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                   &lt;element name="friendly_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *                   &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+     *                   &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
      *                   &lt;element name="description" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                   &lt;element name="unit" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                 &lt;/sequence>
@@ -346,11 +346,11 @@ public class Service {
          *   &lt;complexContent>
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;sequence>
-         *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+         *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
          *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *         &lt;element name="system_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *         &lt;element name="friendly_name" type="{http://www.w3.org/2001/XMLSchema}string"/>
-         *         &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+         *         &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
          *         &lt;element name="description" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *         &lt;element name="unit" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *       &lt;/sequence>
@@ -373,7 +373,7 @@ public class Service {
         })
         public static class Metric {
 
-            protected byte id;
+            protected int id;
             @XmlElement(required = true)
             protected String name;
             @XmlElement(name = "system_name", required = true)
@@ -381,7 +381,7 @@ public class Service {
             @XmlElement(name = "friendly_name", required = true)
             protected String friendlyName;
             @XmlElement(name = "service_id")
-            protected byte serviceId;
+            protected int serviceId;
             @XmlElement(required = true)
             protected String description;
             @XmlElement(required = true)
@@ -391,7 +391,7 @@ public class Service {
              * Gets the value of the id property.
              * 
              */
-            public byte getId() {
+            public int getId() {
                 return id;
             }
 
@@ -399,7 +399,7 @@ public class Service {
              * Sets the value of the id property.
              * 
              */
-            public void setId(byte value) {
+            public void setId(int value) {
                 this.id = value;
             }
 
@@ -479,7 +479,7 @@ public class Service {
              * Gets the value of the serviceId property.
              * 
              */
-            public byte getServiceId() {
+            public int getServiceId() {
                 return serviceId;
             }
 
@@ -487,7 +487,7 @@ public class Service {
              * Sets the value of the serviceId property.
              * 
              */
-            public void setServiceId(byte value) {
+            public void setServiceId(int value) {
                 this.serviceId = value;
             }
 

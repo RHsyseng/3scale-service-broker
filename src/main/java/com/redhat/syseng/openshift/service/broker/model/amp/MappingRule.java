@@ -25,11 +25,11 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
- *         &lt;element name="metric_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *         &lt;element name="metric_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="pattern" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="http_method" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="delta" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *         &lt;element name="delta" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="created_at" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="updated_at" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *       &lt;/sequence>
@@ -53,14 +53,14 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(name = "mapping_rule")
 public class MappingRule {
 
-    protected byte id;
+    protected int id;
     @XmlElement(name = "metric_id")
-    protected byte metricId;
+    protected int metricId;
     @XmlElement(required = true)
     protected String pattern;
     @XmlElement(name = "http_method", required = true)
     protected String httpMethod;
-    protected byte delta;
+    protected int delta;
     @XmlElement(name = "created_at", required = true)
     protected String createdAt;
     @XmlElement(name = "updated_at", required = true)
@@ -70,7 +70,7 @@ public class MappingRule {
      * Gets the value of the id property.
      * 
      */
-    public byte getId() {
+    public int getId() {
         return id;
     }
 
@@ -78,7 +78,7 @@ public class MappingRule {
      * Sets the value of the id property.
      * 
      */
-    public void setId(byte value) {
+    public void setId(int value) {
         this.id = value;
     }
 
@@ -86,7 +86,7 @@ public class MappingRule {
      * Gets the value of the metricId property.
      * 
      */
-    public byte getMetricId() {
+    public int getMetricId() {
         return metricId;
     }
 
@@ -94,7 +94,7 @@ public class MappingRule {
      * Sets the value of the metricId property.
      * 
      */
-    public void setMetricId(byte value) {
+    public void setMetricId(int value) {
         this.metricId = value;
     }
 
@@ -150,7 +150,7 @@ public class MappingRule {
      * Gets the value of the delta property.
      * 
      */
-    public byte getDelta() {
+    public int getDelta() {
         return delta;
     }
 
@@ -158,7 +158,7 @@ public class MappingRule {
      * Sets the value of the delta property.
      * 
      */
-    public void setDelta(byte value) {
+    public void setDelta(int value) {
         this.delta = value;
     }
 

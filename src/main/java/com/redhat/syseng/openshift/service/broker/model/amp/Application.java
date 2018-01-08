@@ -28,13 +28,13 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="created_at" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
  *         &lt;element name="updated_at" type="{http://www.w3.org/2001/XMLSchema}dateTime"/>
  *         &lt;element name="state" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="user_account_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *         &lt;element name="user_account_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="end_user_required" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *         &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *         &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *         &lt;element name="user_key" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="provider_verification_key" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *         &lt;element name="plan">
@@ -42,16 +42,16 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *                   &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *                   &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="state" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                   &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *                   &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *                   &lt;element name="end_user_required" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                   &lt;element name="setup_fee" type="{http://www.w3.org/2001/XMLSchema}float"/>
  *                   &lt;element name="cost_per_month" type="{http://www.w3.org/2001/XMLSchema}float"/>
  *                   &lt;element name="trial_period_days" type="{http://www.w3.org/2001/XMLSchema}string"/>
- *                   &lt;element name="cancellation_period" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+ *                   &lt;element name="cancellation_period" type="{http://www.w3.org/2001/XMLSchema}int"/>
  *                 &lt;/sequence>
  *                 &lt;attribute name="custom" type="{http://www.w3.org/2001/XMLSchema}string" />
  *                 &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -89,7 +89,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 @XmlRootElement(name = "application")
 public class Application {
 
-    protected byte id;
+    protected int id;
     @XmlElement(name = "created_at", required = true)
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar createdAt;
@@ -99,11 +99,11 @@ public class Application {
     @XmlElement(required = true)
     protected String state;
     @XmlElement(name = "user_account_id")
-    protected byte userAccountId;
+    protected int userAccountId;
     @XmlElement(name = "end_user_required", required = true)
     protected String endUserRequired;
     @XmlElement(name = "service_id")
-    protected byte serviceId;
+    protected int serviceId;
     @XmlElement(name = "user_key", required = true)
     protected String userKey;
     @XmlElement(name = "provider_verification_key", required = true)
@@ -121,7 +121,7 @@ public class Application {
      * Gets the value of the id property.
      * 
      */
-    public byte getId() {
+    public int getId() {
         return id;
     }
 
@@ -129,7 +129,7 @@ public class Application {
      * Sets the value of the id property.
      * 
      */
-    public void setId(byte value) {
+    public void setId(int value) {
         this.id = value;
     }
 
@@ -209,7 +209,7 @@ public class Application {
      * Gets the value of the userAccountId property.
      * 
      */
-    public byte getUserAccountId() {
+    public int getUserAccountId() {
         return userAccountId;
     }
 
@@ -217,7 +217,7 @@ public class Application {
      * Sets the value of the userAccountId property.
      * 
      */
-    public void setUserAccountId(byte value) {
+    public void setUserAccountId(int value) {
         this.userAccountId = value;
     }
 
@@ -249,7 +249,7 @@ public class Application {
      * Gets the value of the serviceId property.
      * 
      */
-    public byte getServiceId() {
+    public int getServiceId() {
         return serviceId;
     }
 
@@ -257,7 +257,7 @@ public class Application {
      * Sets the value of the serviceId property.
      * 
      */
-    public void setServiceId(byte value) {
+    public void setServiceId(int value) {
         this.serviceId = value;
     }
 
@@ -416,16 +416,16 @@ public class Application {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+     *         &lt;element name="id" type="{http://www.w3.org/2001/XMLSchema}int"/>
      *         &lt;element name="name" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="type" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="state" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *         &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+     *         &lt;element name="service_id" type="{http://www.w3.org/2001/XMLSchema}int"/>
      *         &lt;element name="end_user_required" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="setup_fee" type="{http://www.w3.org/2001/XMLSchema}float"/>
      *         &lt;element name="cost_per_month" type="{http://www.w3.org/2001/XMLSchema}float"/>
      *         &lt;element name="trial_period_days" type="{http://www.w3.org/2001/XMLSchema}string"/>
-     *         &lt;element name="cancellation_period" type="{http://www.w3.org/2001/XMLSchema}byte"/>
+     *         &lt;element name="cancellation_period" type="{http://www.w3.org/2001/XMLSchema}int"/>
      *       &lt;/sequence>
      *       &lt;attribute name="custom" type="{http://www.w3.org/2001/XMLSchema}string" />
      *       &lt;attribute name="default" type="{http://www.w3.org/2001/XMLSchema}string" />
@@ -451,7 +451,7 @@ public class Application {
     })
     public static class Plan {
 
-        protected byte id;
+        protected int id;
         @XmlElement(required = true)
         protected String name;
         @XmlElement(required = true)
@@ -459,7 +459,7 @@ public class Application {
         @XmlElement(required = true)
         protected String state;
         @XmlElement(name = "service_id")
-        protected byte serviceId;
+        protected int serviceId;
         @XmlElement(name = "end_user_required", required = true)
         protected String endUserRequired;
         @XmlElement(name = "setup_fee")
@@ -469,7 +469,7 @@ public class Application {
         @XmlElement(name = "trial_period_days", required = true)
         protected String trialPeriodDays;
         @XmlElement(name = "cancellation_period")
-        protected byte cancellationPeriod;
+        protected int cancellationPeriod;
         @XmlAttribute(name = "custom")
         protected String custom;
         @XmlAttribute(name = "default")
@@ -479,7 +479,7 @@ public class Application {
          * Gets the value of the id property.
          * 
          */
-        public byte getId() {
+        public int getId() {
             return id;
         }
 
@@ -487,7 +487,7 @@ public class Application {
          * Sets the value of the id property.
          * 
          */
-        public void setId(byte value) {
+        public void setId(int value) {
             this.id = value;
         }
 
@@ -567,7 +567,7 @@ public class Application {
          * Gets the value of the serviceId property.
          * 
          */
-        public byte getServiceId() {
+        public int getServiceId() {
             return serviceId;
         }
 
@@ -575,7 +575,7 @@ public class Application {
          * Sets the value of the serviceId property.
          * 
          */
-        public void setServiceId(byte value) {
+        public void setServiceId(int value) {
             this.serviceId = value;
         }
 
@@ -663,7 +663,7 @@ public class Application {
          * Gets the value of the cancellationPeriod property.
          * 
          */
-        public byte getCancellationPeriod() {
+        public int getCancellationPeriod() {
             return cancellationPeriod;
         }
 
@@ -671,7 +671,7 @@ public class Application {
          * Sets the value of the cancellationPeriod property.
          * 
          */
-        public void setCancellationPeriod(byte value) {
+        public void setCancellationPeriod(int value) {
             this.cancellationPeriod = value;
         }
 

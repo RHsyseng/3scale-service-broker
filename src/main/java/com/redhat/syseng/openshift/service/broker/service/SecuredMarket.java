@@ -34,24 +34,24 @@ import com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil;
 import static com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil.getThreeScaleApiService;
 
 public class SecuredMarket {
-    
+
     private Logger logger = Logger.getLogger(getClass().getName());
-    
+
     Result provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException {
         logger.info("!!!!!!!!!!provisioning /service_instances/{instance_id} : " + instance_id);
         logger.info("provision.getOrganization_guid() : " + provision.getOrganization_guid());
         logger.info("provision.getService_id() : " + provision.getService_id());
         logger.info("provision.getPlan_id() : " + provision.getPlan_id());
         Map<String, Object> inputParameters = provision.getParameters();
-        
+
         logger.info("provision.getParameters().getApplicationName() : " + (String) inputParameters.get("applicationName"));
         logger.info("provision.getParameters().getDescription() : " + (String) inputParameters.get("description"));
-        
+
         PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String applicationId = "";
-        
+
         String userKey = BrokerUtil.searchExistingApplicationBaseOnName((String) inputParameters.get("applicationName"), platformConfig.getAccountId());
-        
+
         if (userKey.equals("")) {
             //create new Application to use the Plan, which will generate a new user_key
             String desc = (String) inputParameters.get("description");
@@ -59,16 +59,16 @@ public class SecuredMarket {
             sp.setName((String) inputParameters.get("applicationName"));
             sp.setDescription(desc);
             sp.setPlan_id(provision.getPlan_id());
-                        
+
             //after this step, in the API Integration page, the user_key will automatically replaced with the new one created below
             com.redhat.syseng.openshift.service.broker.model.amp.Application application = getThreeScaleApiService().createApplication(String.valueOf(platformConfig.getAccountId()), sp);
             logger.info("---------------------application is created, id is : " + application.getId());
             applicationId = String.valueOf(application.getId());
-            
+
             userKey = application.getUserKey();
             logger.info("new created user_key : " + userKey);
         }
-        
+
         String endpoint = BrokerUtil.searchEndPointBasedOnServiceId(provision.getService_id());
         String url = endpoint + "/?user_key=" + userKey;
         Result result = new Result("task_10", url, null);
@@ -76,7 +76,7 @@ public class SecuredMarket {
         logger.info("provisioning result" + result);
         return result;
     }
-    
+
     Service[] getCatalog() throws JAXBException, URISyntaxException {
         Services ampServices = getThreeScaleApiService().listServices();
         logger.info("AMP services: " + ampServices);
@@ -88,18 +88,17 @@ public class SecuredMarket {
             svc.setName(service.getSystemName());
             svc.setBindable(true);
             svc.setPlans(readPlansForOneService(svc.getId()));
-            
             Map<String, Object> metadata = new HashMap<>();
             metadata.put("displayName", "secured-service-market: " + svc.getDescription());
-            metadata.put("documentationUrl", "https://access.redhat.com/documentation/en-us/reference_architectures/2017/html/api_management_with_red_hat_3scale_api_management_platform");
+            metadata.put("documentationUrl", "https://github.com/RHsyseng/3scale-service-broker");
             metadata.put("longDescription", "secured service through 3scale-AMP, name is: " + svc.getDescription());
             svc.setMetadata(metadata);
-            
+
             svcList.add(svc);
         }
         return svcList.toArray(new Service[svcList.size()]);
     }
-    
+
     private Plan[] readPlansForOneService(String serviceId) throws JAXBException, URISyntaxException {
         //call the Application PLan List function
         Plans plans = getThreeScaleApiService().listApplicationPlan(serviceId);
@@ -115,23 +114,23 @@ public class SecuredMarket {
             logger.info("!!!!!!!!!!!!!!!!!! lower the case for ampPlan.getName()" + planName);
             planName = planName.toLowerCase();
             plan.setName(planName);
-            
+
             plan.setDescription(" plan description ...");
             plan.setFree(true);
 
             //create service instance
             Properties properties = new Properties();
-            
+
             Description description = new Description();
             description.setTitle("description");
             description.setType("string");
             ApplicationName applicationName = new ApplicationName();
             applicationName.setTitle("application name");
             applicationName.setType("string");
-            
+
             properties.setDescription(description);
             properties.setApplicationName(applicationName);
-            
+
             Map<String, Object> parameters = new HashMap<>();
             parameters.put("$schema", "http://json-schema.org/draft-04/schema");
             parameters.put("additionalProperties", false);
@@ -139,7 +138,7 @@ public class SecuredMarket {
             String[] required = new String[]{"applicationName", "description"};
             parameters.put("required", required);
             parameters.put("properties", properties);
-            
+
             Create create = new Create();
             create.setParameters(parameters);
             ServiceInstance si = new ServiceInstance();
@@ -148,14 +147,14 @@ public class SecuredMarket {
             //update structure is the same as create
             Create update = new Create();
             si.setUpdate(update);
-            
+
             ServiceBinding sb = new ServiceBinding();
-            
+
             Schemas schemas = new Schemas();
             schemas.setService_binding(sb);
             schemas.setService_instance(si);
             plan.setSchemas(schemas);
-            
+
             planList.add(plan);
         }
         return planList.toArray(new Plan[planList.size()]);
@@ -193,7 +192,7 @@ public class SecuredMarket {
         logger.info("binding planId: " + planId);
         String serviceId = binding.getService_id();
         logger.info("binding serviceId: " + serviceId);
-        
+
         PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String endpoint = BrokerUtil.searchEndPointBasedOnServiceId(serviceId);
         if (endpoint == null) {
@@ -207,7 +206,7 @@ public class SecuredMarket {
             return result;
         }
     }
-    
+
     public void deProvisioning(String instanceId) throws URISyntaxException {
         Persistence persistence = Persistence.getInstance();
         PlatformConfig platformConfig = persistence.getPlatformConfig();
@@ -223,5 +222,5 @@ public class SecuredMarket {
             }
         }
     }
-    
+
 }

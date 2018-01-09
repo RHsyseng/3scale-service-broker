@@ -8,7 +8,7 @@
   "bindable": false,
   "metadata": {
     "displayName": "secure-service-3scale",
-    "documentationUrl": "https://access.qa.redhat.com/documentation/en-us/reference_architectures/2017/html/api_management_with_red_hat_3scale_api_management_platform",
+    "documentationUrl": "https://github.com/RHsyseng/3scale-service-broker",
     "longDescription": "A broker that secures input URL through 3scales-AMP",
     "parameters": [
       {

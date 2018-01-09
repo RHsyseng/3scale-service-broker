@@ -24,7 +24,7 @@ public class Persistence {
     private Persistence() {
         String loadSecuredMarketString = System.getenv("LOAD_SECURED_SERVICE_MARKET");
         if (loadSecuredMarketString == null) {
-            loadSecuredMarket = Boolean.FALSE;
+            loadSecuredMarket = Boolean.TRUE;
         } else {
             loadSecuredMarket = Boolean.valueOf(loadSecuredMarketString);
         }

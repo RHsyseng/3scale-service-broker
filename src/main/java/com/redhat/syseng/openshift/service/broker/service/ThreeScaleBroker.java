@@ -80,7 +80,7 @@ public class ThreeScaleBroker {
         logger.info("Provisioning " + instance_id + " with data " + provision);
         Persistence persistence = Persistence.getInstance();
         Result result = new Result("task_10", null, null);
-        
+
         //Add this check here because for one provision request, OCP spawns mulitple threads, added this "if else check" to make sure only the 1st one go through and recorded
         //otherwise it might cause primary key violation issue in database since the instance ID is PK. 
         if (!persistence.isProvisionInfoExist(instance_id)) {
@@ -111,8 +111,8 @@ public class ThreeScaleBroker {
             //logger.info("persist provision : " + persistence.retrieveProvisionInfo(instance_id).toString());
             logger.info("provision.result: " + result);
 
-        }else{
-                logger.info("ProvisionInfo already exists, skip provision again");            
+        } else {
+            logger.info("ProvisionInfo already exists, skip provision again");
         }
 
         return result;
@@ -125,17 +125,22 @@ public class ThreeScaleBroker {
     public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding, @Context final HttpServletResponse response) throws URISyntaxException {
 // Don't remember why this "WebApplicationException" was added, might not be needed, took it out for now
 //try {
-
-            //logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
-            BindingResult result = new SecuredMarket().binding(binding);
-            logger.info("binding.result : " + result);
-            Persistence persistence = Persistence.getInstance();
-            persistence.persistBindingInfo(instance_id, binding);
-            return result;
 //        } catch (WebApplicationException e) {
 //            response.setStatus(410);
 //            return new BindingResult(null);
 //        }
+
+        //logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
+        Persistence persistence = Persistence.getInstance();
+        BindingResult result = null;
+        if (!persistence.isBindingInfoExist(instance_id)) {
+             result = new SecuredMarket().binding(binding);
+            logger.info("binding.result : " + result);
+            persistence.persistBindingInfo(instance_id, binding);
+        } else {
+            logger.info("Provision already exists, skip binding again");
+        }
+        return result;
     }
 
     @DELETE

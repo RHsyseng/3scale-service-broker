@@ -132,13 +132,13 @@ public class ThreeScaleBroker {
 
         //logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
         Persistence persistence = Persistence.getInstance();
-        BindingResult result = null;
+        BindingResult result = new BindingResult(null);
         if (!persistence.isBindingInfoExist(instance_id)) {
              result = new SecuredMarket().binding(binding);
             logger.info("binding.result : " + result);
             persistence.persistBindingInfo(instance_id, binding);
         } else {
-            logger.info("Provision already exists, skip binding again");
+            logger.info("Binding already exists, skip binding again");
         }
         return result;
     }

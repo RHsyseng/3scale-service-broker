@@ -50,12 +50,9 @@ public class Persistence {
     }
 
     private PlatformConfig readPlatformConfig() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-        } catch (ClassNotFoundException e) {
-            throw new IllegalStateException("Failed to load SQLite driver");
-        }
+
         try (Connection connection = DriverManager.getConnection(SQLITE_DB_URL)) {
+            Class.forName("org.sqlite.JDBC");
             Statement stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
@@ -68,16 +65,19 @@ public class Persistence {
                 platformConfig.setAdminAddress(rs.getString("admin_address"));
                 platformConfig.setAccessToken(rs.getString("access_token"));
                 platformConfig.setAccountId(rs.getString("account_id"));
-                logger.info("rs.getString(\"use_ocp_certification\") " + rs.getString("use_ocp_certification"));                
-                logger.info("rs.getBoolean(\"use_ocp_certification\") " + rs.getBoolean("use_ocp_certification"));                
+                logger.info("rs.getString(\"use_ocp_certification\") " + rs.getString("use_ocp_certification"));
+                logger.info("rs.getBoolean(\"use_ocp_certification\") " + rs.getBoolean("use_ocp_certification"));
                 platformConfig.setUseOcpCertificate(rs.getBoolean("use_ocp_certification"));
                 logger.info("Loaded " + platformConfig);
-                persistenceLoaded = true;                
+                persistenceLoaded = true;
                 return platformConfig;
             } else {
                 logger.info("no configuration to load, this is the initial stage ");
                 return null;
             }
+        } catch (ClassNotFoundException e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException("sqlite class is not found, could be classpath issue: " + e);
         } catch (SQLException e) {
             if (e.getMessage().contains("no such table: CONFIGURATION_TABLE")) {
                 //This is normal, because 1st time read the sqlite3, the table is not even created. 
@@ -89,26 +89,30 @@ public class Persistence {
         }
     }
 
-    public void setConfiguration(String instanceId, String configurationName, PlatformConfig platformConfig) throws ClassNotFoundException, SQLException {
+    public void setConfiguration(String instanceId, String configurationName, PlatformConfig platformConfig) {
 
         Statement stmt = null;
-        Class.forName("org.sqlite.JDBC");
         try (Connection connection = DriverManager.getConnection(SQLITE_DB_URL)) {
             logger.info("Opened database successfully");
 
+            Class.forName("org.sqlite.JDBC");
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
             //Boolean Datatype. SQLite does not have a separate Boolean storage class. Instead, Boolean values are stored as integers 0 (false) and 1 (true).
             //without conversion, Java boolean true will be stored as "true", then when retrive using rs.getBoolean, the value will be false.
             int booleanValueInSqlite = 1;
-            if (!platformConfig.isUseOcpCertificate()) booleanValueInSqlite = 0;
+            if (!platformConfig.isUseOcpCertificate()) {
+                booleanValueInSqlite = 0;
+            }
 
-            
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS CONFIGURATION_TABLE (instance_id TEXT PRIMARY KEY, configuration_name TEXT,  admin_address TEXT, access_token TEXT, account_id TEXT, use_ocp_certification TEXT);");
             String sqlString = "insert into CONFIGURATION_TABLE values(\"" + instanceId + "\",\"" + configurationName + "\",\"" + platformConfig.getAdminAddress() + "\",\"" + platformConfig.getAccessToken() + "\",\"" + platformConfig.getAccountId() + "\",\"" + booleanValueInSqlite + "\");";
             logger.info("insert string: " + sqlString);
             stmt.executeUpdate(sqlString);
+        } catch (ClassNotFoundException | SQLException e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException(e);
         }
     }
 
@@ -131,7 +135,11 @@ public class Persistence {
             //connection.commit();
             stmt.close();
             connection.close();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException("sqlite class is not found, could be classpath issue: " + e);
+        } catch (SQLException e) {
+            //no need to further throw exception here, it could be between tests the database info might be deleted already.
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
         logger.info("deleteAmpConfiguration" + instanceId);
@@ -162,8 +170,9 @@ public class Persistence {
             //connection.commit();
             stmt.close();
             connection.close();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | SQLException e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException(e);
         }
         logger.info("persistProvisionInfo: instanceId" + instanceId + " provision: " + provision.toString());
 
@@ -188,7 +197,11 @@ public class Persistence {
             //connection.commit();
             stmt.close();
             connection.close();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException("sqlite class is not found, could be classpath issue: " + e);
+        } catch (SQLException e) {
+            //no need to further throw exception here, it could be between tests the database info might be deleted already.
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
         logger.info("deleteProvisionInfo: instanceId" + instanceId);
@@ -219,8 +232,9 @@ public class Persistence {
             rs.close();
             stmt.close();
             connection.close();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | SQLException e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException("retrieveProvisionInfo has problem: " + e);
         }
         //logger.info("retrieveProvisionInfo: " + instanceId);
         return result;
@@ -251,18 +265,14 @@ public class Persistence {
             rs.close();
             stmt.close();
             connection.close();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | SQLException e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
-            /*no need to do the judge below, since if the table is not there, of course the info doesn't exist
-            if (e.getMessage().contains("no such table: PROVISION_TABLE")) {
-                //This is normal, because 1st time read the sqlite3, the table is not even created. 
-                logger.info("no such table: PROVISION_TABLE, this is the initial stage ");
-                */
+            throw new IllegalStateException(e);
         }
         //logger.info("isProvisionInfoExist: " + result);
         return result;
 
-    }    
+    }
 
     public void persistBindingInfo(String instanceId, Object bindingInfo) {
 
@@ -284,8 +294,9 @@ public class Persistence {
             //connection.commit();
             stmt.close();
             connection.close();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | SQLException e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException(e);
         }
         //logger.info("persistBindingInfo: instanceId" + instanceId + " bindingInfo: " + bindingInfo);
 
@@ -310,7 +321,11 @@ public class Persistence {
             //connection.commit();
             stmt.close();
             connection.close();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException("sqlite class is not found, could be classpath issue: " + e);
+        } catch (SQLException e) {
+            //no need to further throw exception here, it could be between tests the database info might be deleted already.
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
         logger.info("deleteBindingInfo " + instanceId);
@@ -341,8 +356,9 @@ public class Persistence {
             rs.close();
             stmt.close();
             connection.close();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | SQLException e) {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException(e);
         }
         //logger.info("retrieveBindingInfo: " + instanceId);
         return result;

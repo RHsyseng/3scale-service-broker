@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.redhat.syseng.openshift.service.broker.service.util;
 
 import java.io.StringWriter;
@@ -29,7 +24,6 @@ import com.redhat.syseng.openshift.service.broker.model.amp.Services;
 import com.redhat.syseng.openshift.service.broker.model.service.MappingRulesParameters;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
@@ -37,16 +31,11 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateFactory;
-import java.security.cert.CertificateNotYetValidException;
 import java.util.logging.Level;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
-/**
- * @author czhu
- */
 public class BrokerUtil {
 
     private static Logger logger = Logger.getLogger(BrokerUtil.class.getName());
@@ -59,9 +48,6 @@ public class BrokerUtil {
             FileInputStream in = null;
             try {
                 in = new FileInputStream("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt");
-                //in = new FileInputStream("/home/czhu/works/openServiceBroker/middleware.ocp.cloud.lab.eng.bos.redhat.com.crt");
-                //in = new FileInputStream("/home/czhu/works/openServiceBroker/rsaebs.corp.redhat.com.crt");
-                //in = new FileInputStream("/home/czhu/works/openServiceBroker/mojo.redhat.com.crt");
 
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
                 Certificate cert = cf.generateCertificate(in);
@@ -82,39 +68,29 @@ public class BrokerUtil {
                 clientBuilder.sslContext(ctx);
                 client = clientBuilder.build();
 
-                try {
-                    if (in != null) {
-                        in.close();
-                    }
-                } catch (IOException ex) {
-                    Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+                if (in != null) {
+                    in.close();
                 }
 
-            } catch (FileNotFoundException ex) {
+            } catch (CertificateException | IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException ex) {
                 Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (CertificateExpiredException ex) {
-                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (CertificateNotYetValidException ex) {
-                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (CertificateException ex) {
-                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (KeyStoreException ex) {
-                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (NoSuchAlgorithmException ex) {
-                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (KeyManagementException ex) {
-                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+                throw new IllegalStateException(ex);
             }
 
             //use filter to add http header
             RestClientRequestFilter filter = new RestClientRequestFilter();
             client.register(filter);
         } else {
-            //client = new ResteasyClientBuilder().build();
-            //This is for local testing only
-            client = new ResteasyClientBuilder().disableTrustManager().build();
+            String allowAllCertification = System.getenv("DISABLE_TRUST_MANAGER");
+            if (allowAllCertification == null || !allowAllCertification.equals("true")) {
+                client = new ResteasyClientBuilder().build();
+            } else {
+                //This is disableTrustManager() for local swam testing only, which equals to "curl -k or --insecure option"
+                //by default it shouldn't be set to true
+                logger.warning("allowAllCertification is set to true!!!!!!");
+                client = new ResteasyClientBuilder().disableTrustManager().build();
+            }
+
         }
         return client;
     }
@@ -215,7 +191,6 @@ public class BrokerUtil {
 
         if (!userKey.equals("")) {
             logger.info("found user_key for this service id : " + userKey);
-
         } else {
             logger.info("didn't found user_key for this serviceId: " + serviceId + " and planId: " + planId);
         }

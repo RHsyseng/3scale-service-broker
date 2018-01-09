@@ -38,15 +38,16 @@ public class SecuredMarket {
     private Logger logger = Logger.getLogger(getClass().getName());
 
     Result provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException {
+        Map<String, Object> inputParameters = provision.getParameters();
+        /*
         logger.info("!!!!!!!!!!provisioning /service_instances/{instance_id} : " + instance_id);
         logger.info("provision.getOrganization_guid() : " + provision.getOrganization_guid());
         logger.info("provision.getService_id() : " + provision.getService_id());
         logger.info("provision.getPlan_id() : " + provision.getPlan_id());
-        Map<String, Object> inputParameters = provision.getParameters();
-
         logger.info("provision.getParameters().getApplicationName() : " + (String) inputParameters.get("applicationName"));
         logger.info("provision.getParameters().getDescription() : " + (String) inputParameters.get("description"));
-
+        */
+        
         PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String applicationId = "";
 

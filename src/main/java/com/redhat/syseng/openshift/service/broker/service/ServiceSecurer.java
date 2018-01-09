@@ -24,16 +24,17 @@ public class ServiceSecurer {
 
     Result provisioningForSecureService(String instanceId, Provision provision) throws URISyntaxException //public String provisioning( String testString) {
     {
+        Map<String, Object> inputParameters = provision.getParameters();
+        
         logger.info("!!!!!!!!!!provisioning /service_instances/{instance_id} : " + instanceId);
+        /*
         logger.info("provision.getService_id() : " + provision.getService_id());
         logger.info("provision.getOrganization_guid() : " + provision.getOrganization_guid());
-
-        Map<String, Object> inputParameters = provision.getParameters();
-
         logger.info("provision.getParameters().getService_name() : " + (String) inputParameters.get("service_name"));
         logger.info("provision.getParameters().getApplication_plan() : " + (String) inputParameters.get("application_plan"));
         logger.info("provision.getParameters().getInput_url() : " + (String) inputParameters.get("input_url"));
         logger.info("provision.getParameters().getApplication_name() : " + (String) inputParameters.get("application_name"));
+        */
 
         PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String url = searchServiceInstance((String) inputParameters.get("service_name"));

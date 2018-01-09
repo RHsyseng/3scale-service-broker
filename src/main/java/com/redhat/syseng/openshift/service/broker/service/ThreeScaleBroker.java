@@ -18,7 +18,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBException;
@@ -82,7 +81,8 @@ public class ThreeScaleBroker {
         Persistence persistence = Persistence.getInstance();
         Result result = new Result("task_10", null, null);
         
-        //Add this check here because the OCP spawns mulitple threads for same provision, make sure only the 1st one go through
+        //Add this check here because for one provision request, OCP spawns mulitple threads, added this "if else check" to make sure only the 1st one go through and recorded
+        //otherwise it might cause primary key violation issue in database since the instance ID is PK. 
         if (!persistence.isProvisionInfoExist(instance_id)) {
             if (provision.getParameters().containsKey("input_url")) {
 
@@ -123,18 +123,19 @@ public class ThreeScaleBroker {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding, @Context final HttpServletResponse response) throws URISyntaxException {
-        try {
+// Don't remember why this "WebApplicationException" was added, might not be needed, took it out for now
+//try {
 
-            logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
+            //logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
             BindingResult result = new SecuredMarket().binding(binding);
             logger.info("binding.result : " + result);
             Persistence persistence = Persistence.getInstance();
             persistence.persistBindingInfo(instance_id, binding);
             return result;
-        } catch (WebApplicationException e) {
-            response.setStatus(410);
-            return new BindingResult(null);
-        }
+//        } catch (WebApplicationException e) {
+//            response.setStatus(410);
+//            return new BindingResult(null);
+//        }
     }
 
     @DELETE

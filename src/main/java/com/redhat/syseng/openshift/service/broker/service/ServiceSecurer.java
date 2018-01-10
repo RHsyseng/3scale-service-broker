@@ -139,10 +139,15 @@ public class ServiceSecurer {
         String provisionInfo = persistence.retrieveProvisionInfo(instanceId);
         if (null != provisionInfo && !"".equals(provisionInfo)) {
             String serviceId = provisionInfo.substring(provisionInfo.indexOf("service_id='") + "service_id='".length(), provisionInfo.indexOf("', organization_guid"));
-            logger.info("ServiceSecurer.deProvisioning, serviceId  : " + serviceId);
             if (null != serviceId && !"".equals(serviceId)) {
-                getThreeScaleApiService().deleteService(serviceId);
-                logger.info("ServiceSecurer.deProvisioning, serviceId is deleted from 3scale AMP : " + serviceId);
+                try {
+                    getThreeScaleApiService().deleteService(serviceId);
+                } catch (javax.ws.rs.NotFoundException e) {
+                    //this is ignorable exception might be result of testing, but have to have catch it, otherwise the deProvisioning won't return
+                    //thus OCP won't stop invoking with the same instanceId again and again. 
+                    logger.info("deProvisioning: at 3 scale side couldn't find the service with this serviceId: " + serviceId);
+                } 
+                //logger.info("ServiceSecurer.deProvisioning, serviceId is deleted from 3scale AMP : " + serviceId);
             }
         }
     }

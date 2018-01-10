@@ -204,7 +204,7 @@ public class Persistence {
             //no need to further throw exception here, it could be between tests the database info might be deleted already.
             logger.info(e.getClass().getName() + ": " + e.getMessage());
         }
-        logger.info("deleteProvisionInfo: instanceId" + instanceId);
+        logger.info("deleteProvisionInfo: instanceId: " + instanceId);
 
     }
 

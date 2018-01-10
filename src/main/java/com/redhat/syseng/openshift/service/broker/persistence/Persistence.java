@@ -51,8 +51,9 @@ public class Persistence {
 
     private PlatformConfig readPlatformConfig() {
 
-        try (Connection connection = DriverManager.getConnection(SQLITE_DB_URL)) {
+        try {
             Class.forName("org.sqlite.JDBC");
+            Connection connection = DriverManager.getConnection(SQLITE_DB_URL);
             Statement stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
@@ -79,7 +80,7 @@ public class Persistence {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
             throw new IllegalStateException("sqlite class is not found, could be classpath issue: " + e);
         } catch (SQLException e) {
-            if (e.getMessage().contains("no such table: CONFIGURATION_TABLE") ||e.getMessage().contains("No suitable driver found for jdbc:sqlite") ) {
+            if (e.getMessage().contains("no such table: CONFIGURATION_TABLE")) {
                 //This is normal, because 1st time read the sqlite3, the table for even the database file might not be there. 
                 logger.info("no such table: CONFIGURATION_TABLE, and configuration to load, this is the initial stage ");
                 initialCreateTables();
@@ -92,10 +93,11 @@ public class Persistence {
     
     public void initialCreateTables() {
         Statement stmt = null;
-        try (Connection connection = DriverManager.getConnection(SQLITE_DB_URL)) {
-            logger.info("Opened database successfully in initialCreateTables");
-
+        try {
             Class.forName("org.sqlite.JDBC");
+            Connection connection = DriverManager.getConnection(SQLITE_DB_URL);
+            logger.info("Opened database successfully");
+
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
@@ -112,10 +114,11 @@ public class Persistence {
 
     public void setConfiguration(String instanceId, String configurationName, PlatformConfig platformConfig) {
         Statement stmt = null;
-        try (Connection connection = DriverManager.getConnection(SQLITE_DB_URL)) {
+        try {
+            Class.forName("org.sqlite.JDBC");
+            Connection connection = DriverManager.getConnection(SQLITE_DB_URL);
             logger.info("Opened database successfully");
 
-            Class.forName("org.sqlite.JDBC");
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 

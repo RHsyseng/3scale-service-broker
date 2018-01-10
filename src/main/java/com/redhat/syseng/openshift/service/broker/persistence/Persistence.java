@@ -83,7 +83,12 @@ public class Persistence {
                 //This is normal, because 1st time read the sqlite3, the table is not even created. 
                 logger.info("no such table: CONFIGURATION_TABLE, and configuration to load, this is the initial stage ");
                 return null;
-            } else {
+            } else if (e.getMessage().contains("No suitable driver found for jdbc:sqlite")){
+                //This is normal, because 1st time the database file is not created yet, ignore.
+                logger.info("no such table: CONFIGURATION_TABLE, and configuration to load, this is the initial stage ");
+                return null;
+               
+            }else {
                 throw new IllegalStateException("Failed to read configuration from SQLite: " + e);
             }
         }

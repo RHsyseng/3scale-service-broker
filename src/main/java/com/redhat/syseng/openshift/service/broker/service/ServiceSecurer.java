@@ -25,7 +25,7 @@ public class ServiceSecurer {
     Result provisioningForSecureService(String instanceId, Provision provision) throws URISyntaxException //public String provisioning( String testString) {
     {
         Map<String, Object> inputParameters = provision.getParameters();
-        
+
         logger.info("!!!!!!!!!!provisioning /service_instances/{instance_id} : " + instanceId);
         /*
         logger.info("provision.getService_id() : " + provision.getService_id());
@@ -34,7 +34,7 @@ public class ServiceSecurer {
         logger.info("provision.getParameters().getApplication_plan() : " + (String) inputParameters.get("application_plan"));
         logger.info("provision.getParameters().getInput_url() : " + (String) inputParameters.get("input_url"));
         logger.info("provision.getParameters().getApplication_name() : " + (String) inputParameters.get("application_name"));
-        */
+         */
 
         PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String url = searchServiceInstance((String) inputParameters.get("service_name"));
@@ -48,11 +48,11 @@ public class ServiceSecurer {
             parameters.put("system_name", (String) inputParameters.get("service_name"));
             parameters.put("description", "instance_id:" + instanceId);
 
-            ServiceParameters sp = new ServiceParameters();            
+            ServiceParameters sp = new ServiceParameters();
             sp.setName((String) inputParameters.get("service_name"));
             sp.setSystem_name((String) inputParameters.get("service_name"));
             sp.setDescription("instance_id:" + instanceId);
-            
+
             com.redhat.syseng.openshift.service.broker.model.amp.Service service = getThreeScaleApiService().createService(sp);
             String serviceId = String.valueOf(service.getId());
             logger.info("serviceId : " + serviceId);
@@ -133,8 +133,7 @@ public class ServiceSecurer {
         logger.info("user is activated");
 
     }
-*/
-
+     */
     public void deProvisioning(String instanceId) throws URISyntaxException {
         Persistence persistence = Persistence.getInstance();
         String provisionInfo = persistence.retrieveProvisionInfo(instanceId);
@@ -143,6 +142,7 @@ public class ServiceSecurer {
             logger.info("ServiceSecurer.deProvisioning, serviceId  : " + serviceId);
             if (null != serviceId && !"".equals(serviceId)) {
                 getThreeScaleApiService().deleteService(serviceId);
+                logger.info("ServiceSecurer.deProvisioning, serviceId is deleted from 3scale AMP : " + serviceId);
             }
         }
     }

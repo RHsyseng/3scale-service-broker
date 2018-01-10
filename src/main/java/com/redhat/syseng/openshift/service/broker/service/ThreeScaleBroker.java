@@ -180,6 +180,8 @@ public class ThreeScaleBroker {
             new SecuredMarket().deProvisioning(instanceId);
         }
         persistence.deleteProvisionInfo(instanceId);
+         logger.info("Provisioning is deleted from persistence, deProvisioning finished ");
+        
         return new Result(null, null, null);
 
     }

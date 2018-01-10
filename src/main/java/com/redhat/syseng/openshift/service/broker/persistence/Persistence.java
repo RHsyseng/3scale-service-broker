@@ -79,23 +79,38 @@ public class Persistence {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
             throw new IllegalStateException("sqlite class is not found, could be classpath issue: " + e);
         } catch (SQLException e) {
-            if (e.getMessage().contains("no such table: CONFIGURATION_TABLE")) {
-                //This is normal, because 1st time read the sqlite3, the table is not even created. 
+            if (e.getMessage().contains("no such table: CONFIGURATION_TABLE") ||e.getMessage().contains("No suitable driver found for jdbc:sqlite") ) {
+                //This is normal, because 1st time read the sqlite3, the table for even the database file might not be there. 
                 logger.info("no such table: CONFIGURATION_TABLE, and configuration to load, this is the initial stage ");
+                initialCreateTables();
                 return null;
-            } else if (e.getMessage().contains("No suitable driver found for jdbc:sqlite")){
-                //This is normal, because 1st time the database file is not created yet, ignore.
-                logger.info("no such table: CONFIGURATION_TABLE, and configuration to load, this is the initial stage ");
-                return null;
-               
-            }else {
+            } else {
                 throw new IllegalStateException("Failed to read configuration from SQLite: " + e);
             }
         }
     }
+    
+    public void initialCreateTables() {
+        Statement stmt = null;
+        try (Connection connection = DriverManager.getConnection(SQLITE_DB_URL)) {
+            logger.info("Opened database successfully in initialCreateTables");
+
+            Class.forName("org.sqlite.JDBC");
+            stmt = connection.createStatement();
+            stmt.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            //create three tables needed.
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS CONFIGURATION_TABLE (instance_id TEXT PRIMARY KEY, configuration_name TEXT,  admin_address TEXT, access_token TEXT, account_id TEXT, use_ocp_certification TEXT);");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PROVISION_TABLE (instance_id TEXT PRIMARY KEY,  provision_info TEXT);");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS BINDING_TABLE (instance_id TEXT PRIMARY KEY,  binding_info TEXT);");
+            logger.info("created all needed tables successfully");
+        } catch (ClassNotFoundException | SQLException e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException(e);
+        }
+    }    
 
     public void setConfiguration(String instanceId, String configurationName, PlatformConfig platformConfig) {
-
         Statement stmt = null;
         try (Connection connection = DriverManager.getConnection(SQLITE_DB_URL)) {
             logger.info("Opened database successfully");

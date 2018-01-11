@@ -31,6 +31,7 @@ import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
 import com.redhat.syseng.openshift.service.broker.persistence.Persistence;
 import com.redhat.syseng.openshift.service.broker.persistence.PlatformConfig;
+import javax.ws.rs.WebApplicationException;
 
 @Path("/v2")
 public class ThreeScaleBroker {
@@ -118,6 +119,7 @@ public class ThreeScaleBroker {
         return result;
     }
 
+    /*
     @PUT
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -142,7 +144,28 @@ public class ThreeScaleBroker {
         }
         return result;
     }
+*/
 
+    
+    @PUT
+    @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding, @Context final HttpServletResponse response) throws URISyntaxException {
+        try {
+
+            logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
+            BindingResult result = new SecuredMarket().binding(binding);
+            logger.info("binding.result : " + result);
+            Persistence persistence = Persistence.getInstance();
+            persistence.persistBindingInfo(instance_id, binding);
+            return result;
+        } catch (WebApplicationException e) {
+            response.setStatus(410);
+            return new BindingResult(null);
+        }
+    }    
+    
     @DELETE
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Produces({MediaType.APPLICATION_JSON})

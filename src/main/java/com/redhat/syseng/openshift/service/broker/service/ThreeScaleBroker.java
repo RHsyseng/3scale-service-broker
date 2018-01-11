@@ -119,7 +119,7 @@ public class ThreeScaleBroker {
         return result;
     }
 
-    /*
+    
     @PUT
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -132,21 +132,24 @@ public class ThreeScaleBroker {
 //            return new BindingResult(null);
 //        }
 
-        //logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
+        //Note: 1) OCP spawns multi thread for the binding
+        //2) And if only first result return the user_key, URL, but the other return null, then in OCP console, the secret is set to empty
+        //3) Since the securedMarket binding is read-only, it can be executed multiple times
+        //4) So let it run, only limit the persist binding info for the 1st request to avoid DB exception in the log. 
         Persistence persistence = Persistence.getInstance();
-        BindingResult result = new BindingResult(null);
+        BindingResult result = new SecuredMarket().binding(binding);
+        logger.info("binding.result : " + result);        
         if (!persistence.isBindingInfoExist(instance_id)) {
-             result = new SecuredMarket().binding(binding);
-            logger.info("binding.result : " + result);
             persistence.persistBindingInfo(instance_id, binding);
+            logger.info("persist binding for this instance_id : " + instance_id);             
         } else {
-            logger.info("Binding already exists, skip binding again");
+            logger.info("Skip persistence because binding already exists for this instance_id: " + instance_id);
         }
         return result;
     }
-*/
 
-    
+
+    /*
     @PUT
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -165,6 +168,7 @@ public class ThreeScaleBroker {
             return new BindingResult(null);
         }
     }    
+*/
     
     @DELETE
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")

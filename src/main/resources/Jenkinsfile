@@ -7,6 +7,7 @@ node {
     def serviceCurl = ""
     def OC_HOME = "/home/czhu/works/ocClient"    
     
+    /*
     stage ('clean 3scale services') {
     // Git checkout before load source the file
     checkout scm
@@ -205,4 +206,22 @@ node {
 
         } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe & FindBugs reports...
     }
+    */
+   
+    stage ('Recreate Broker') {
+        //API integration
+        println("---------------------------------- Recreate Broker  ----------------------------------")
+        //delete the old three-scale application first
+        withEnv(["PATH+OC=${OC_HOME}"]) {
+            sh "${OC_HOME}/oc delete ClusterServiceBroker 3scale-broker"
+            sh "sleep 5"
+            sh "${OC_HOME}/oc get ClusterServiceBroker"
+                    
+            sh "${OC_HOME}/oc create -f 3scale-broker.yml"
+            sh "sleep 5"
+            sh "${OC_HOME}/oc describe ClusterServiceBroker 3scale-broker"
+        }        
+
+        println("---------------------------------- Recreate Broker is finished ----------------------------------")
+    }    
 }

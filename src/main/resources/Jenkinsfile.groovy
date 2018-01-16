@@ -1,4 +1,5 @@
 #!/usr/bin/groovy
+//https://github.com/RHsyseng/3scale-service-broker
 
 node { 
 
@@ -236,4 +237,41 @@ node {
 
         println("------------------------------------------------------- Recreate Broker is finished -------------------------------------------------------")
     }    
+    
+    
+    stage ('Test1: getCatalog') {
+        //API integration
+        println("---------------------------------- Test1: getCatalog  ----------------------------------")
+
+        withEnv(["PATH+OC=${OC_HOME}"]) {
+            try {
+                sh "${OC_HOME}/oc expose service three-scale --hostname=test.broker.com"
+            }catch(err) {
+                echo "!!!!!!!!!!!!!!!!!!Error means there is an existing test.broker.com, no need to create, just continue for curl test..."
+            }            
+            sh "sleep 5"
+            //            def result = sh "curl http://test.broker.com/v2/catalog "
+            
+            def result = sh (
+                script: 'curl http://test.broker.com/v2/catalog',
+//                script: 'curl http://www.google.ca',
+                returnStdout: true
+            ).trim()    
+            echo "curl result: ${result}"   
+            
+            def expectWords = "{\"services\""
+            if (!result.contains(expectWords)){
+                echo "result didn't contain following expect words: ${expectWords} "
+                currentBuild.result = 'FAILURE'
+            }else{
+                echo "Good result, passed!"
+            }
+ 
+        }        
+
+        println("---------------------------------- Test1: getCatalog is finished ----------------------------------")
+    }    
+    
+    
+    
 }

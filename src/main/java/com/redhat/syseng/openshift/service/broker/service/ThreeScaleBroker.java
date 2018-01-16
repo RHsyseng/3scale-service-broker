@@ -206,6 +206,7 @@ public class ThreeScaleBroker {
             logger.info("deProvisioning for secured market, will delete the application from 3scale AMP");
             new SecuredMarket().deProvisioning(instanceId);
         }
+         logger.info("now delete the provisioning info from persistence layer");
         persistence.deleteProvisionInfo(instanceId);
          logger.info("Provisioning is deleted from persistence, deProvisioning finished ");
         

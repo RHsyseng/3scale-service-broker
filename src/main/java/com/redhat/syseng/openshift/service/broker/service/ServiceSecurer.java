@@ -141,13 +141,20 @@ public class ServiceSecurer {
             String serviceId = provisionInfo.substring(provisionInfo.indexOf("service_id='") + "service_id='".length(), provisionInfo.indexOf("', organization_guid"));
             if (null != serviceId && !"".equals(serviceId)) {
                 try {
+                    logger.info("ServiceSecurer.deProvisioning, before deleting serviceId from 3scale AMP : " + serviceId);
                     getThreeScaleApiService().deleteService(serviceId);
                 } catch (javax.ws.rs.NotFoundException e) {
                     //this is ignorable exception might be result of testing, but have to have catch it, otherwise the deProvisioning won't return
                     //thus OCP won't stop invoking with the same instanceId again and again. 
                     logger.info("deProvisioning: at 3 scale side couldn't find the service with this serviceId: " + serviceId);
-                } 
-                //logger.info("ServiceSecurer.deProvisioning, serviceId is deleted from 3scale AMP : " + serviceId);
+                } catch (javax.ws.rs.client.ResponseProcessingException e) {
+                    if (e.getMessage().contains("org.xml.sax.SAXParseException; Premature end of file.")) {
+                        logger.info("deProvisioning: org.xml.sax.SAXParseException; Premature end of file, ingore since it doesn't cause problem because 3scale side service is indeed deleted");
+                    }else{
+                        throw new IllegalStateException(e);
+                    }
+                }
+                logger.info("ServiceSecurer.deProvisioning, serviceId is deleted from 3scale AMP : " + serviceId);
             }
         }
     }

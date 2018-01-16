@@ -214,8 +214,6 @@ node {
             // Run the maven build
             sh "mvn clean fabric8:deploy -Popenshift"
 
-            // Wait for the server to be up before continue
-            sh "sleep 60"
         } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe & FindBugs reports...
         
         println("------------------------------------------------------- OCP Build and Deploy is finished -------------------------------------------------------")
@@ -224,8 +222,12 @@ node {
     
    
     stage ('Recreate Broker') {
-        //API integration
+
         println("------------------------------------------------------- Recreate Broker  -------------------------------------------------------")
+            // Wait for the server to be up before continue
+            sh "sleep 60"
+        
+        
         //delete the old three-scale application first
         withEnv(["PATH+OC=${OC_HOME}"]) {
             sh "${OC_HOME}/oc delete ClusterServiceBroker 3scale-broker"
@@ -242,7 +244,6 @@ node {
     
     
     stage ('Test1: getCatalog') {
-        //API integration
         println("---------------------------------- Test1: getCatalog  ----------------------------------")
 
         withEnv(["PATH+OC=${OC_HOME}"]) {
@@ -256,7 +257,6 @@ node {
             
             def result = sh (
                 script: 'curl http://test.broker.com/v2/catalog',
-//                script: 'curl http://www.google.ca',
                 returnStdout: true
             ).trim()    
             echo "curl result: ${result}"   

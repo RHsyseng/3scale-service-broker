@@ -214,6 +214,8 @@ node {
             // Run the maven build
             sh "mvn clean fabric8:deploy -Popenshift"
 
+            // Wait for the server to be up before continue
+            sh "sleep 60"
         } // withMaven will discover the generated Maven artifacts, JUnit Surefire & FailSafe & FindBugs reports...
         
         println("------------------------------------------------------- OCP Build and Deploy is finished -------------------------------------------------------")

@@ -156,17 +156,18 @@ public class BrokerUtil {
     public static String searchExistingApplicationBaseOnName(String applicationName, String accountId) throws URISyntaxException {
 
         Applications applications = getThreeScaleApiService().getApplications(accountId);
-        logger.info("searchExistingApplicationBaseOnName: " + applications);
+        logger.info("searchExistingApplicationBaseOnName: " + applicationName);
 
         String userKey = "";
         for (Application application : applications.getApplication()) {
             String name = application.getName();
-            if (name.endsWith(applicationName)) {
+            if (name.equals(applicationName)) {
                 userKey = application.getUserKey();
                 logger.info("found existing application, userKey is : " + userKey);
             }
         }
 
+        logger.info("searchExistingApplicationBaseOnName will return userKey: " + userKey);
         return userKey;
     }
 

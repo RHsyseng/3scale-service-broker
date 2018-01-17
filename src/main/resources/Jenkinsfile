@@ -289,7 +289,7 @@ node {
     
     stage ('Test2: provisionSecureServices') {
         //Test provisionSecuredServices with instance id = 123
-        println("---------------------------------- Test provisionSecuredServices  ----------------------------------")
+        println("---------------------------------- Test2: provisionSecuredServices  ----------------------------------")
             
         //do a deprovisioning first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
         //without deprovisioning first it might also failed because same service name exists at 3 scale side. 
@@ -299,7 +299,7 @@ node {
         
         
         def result = sh (
-            script: "curl  -H \"Content-Type: application/json\" -X PUT -d '{\"context\":{\"platform\":\"ocp\",\"namespace\":\"some-namespace\"},\"service_id\":\"service-guid-here\",\"plan_id\":\"plan-guid-here\",\"organization_guid\":\"org-guid-here\",\"space_guid\":\"space-guid-here\",\"parameters\":{\"service_name\":\"testapi\",\"application_plan\":\"plan1\",\"input_url\":\"http://www.google.com\",\"application_name\":\"testApp1\"}}'  http://test.broker.com/v2/service_instances/123",
+            script: "curl  -H \"Content-Type: application/json\" -X PUT -d '{\"context\":{\"platform\":\"ocp\",\"namespace\":\"some-namespace\"},\"service_id\":\"service-guid-here\",\"plan_id\":\"plan-guid-here\",\"organization_guid\":\"org-guid-here\",\"space_guid\":\"space-guid-here\",\"parameters\":{\"service_name\":\"testSecureService\",\"application_plan\":\"testSecureServicePlan\",\"input_url\":\"http://www.google.com\",\"application_name\":\"testSecureServiceApp\"}}'  http://test.broker.com/v2/service_instances/123",
             returnStdout: true
         ).trim()    
         echo "curl result: ${result}"   
@@ -317,7 +317,7 @@ node {
     
     stage ('Test3: provisionSecuredMarket') {
         //Test provisionSecuredServices with instance id = 123
-        println("---------------------------------- Test provisionSecuredMarket  ----------------------------------")
+        println("---------------------------------- Test3: provisionSecuredMarket  ----------------------------------")
             
         //do a deprovisioning first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
         //without deprovisioning first it might also failed because same name exists at 3 scale side. 
@@ -336,8 +336,7 @@ node {
         }else{
             echo "good result, passed"
         }
-        println("---------------------------------- Test2: provisionSecuredMarket is finished ----------------------------------")
- 
+        println("---------------------------------- Test3: provisionSecuredMarket is finished ----------------------------------")
     }      
 
     

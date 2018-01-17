@@ -293,7 +293,6 @@ node {
             
         //do a deprovisioning first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
         //without deprovisioning first it might also failed because same service name exists at 3 scale side. 
-        //test instance id: 123
         sh "curl  -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/123?plan_id=secure-service-plan-id&service_id=secure-service-id\""
       
         
@@ -316,7 +315,7 @@ node {
     }        
     
     stage ('Test3: provisionSecuredMarket') {
-        //Test provisionSecuredServices with instance id = 123
+        //Test provisionSecuredMarket with instance id = 5555
         println("---------------------------------- Test3: provisionSecuredMarket  ----------------------------------")
             
         //do a deprovisioning first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
@@ -341,11 +340,10 @@ node {
     }      
     
     stage ('Test4: BindingForSecuredMarket') {
-        //Test provisionSecuredServices with instance id = 123
+        //test BindingForSecuredMarket with instance id = 8888, binding id = 9999, note we didn't really use binding id anyway.
         println("---------------------------------- Test4: BindingForSecuredMarket  ----------------------------------")
             
         //do a unbinding first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
-        //test instance id: 8888, binding id: 9999, note we didn't really use binding id anyway.
         sh "curl  -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/8888/service_bindings/9999\""
         
         def result = sh (

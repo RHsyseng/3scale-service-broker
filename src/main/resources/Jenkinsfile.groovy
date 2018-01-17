@@ -32,7 +32,7 @@ node {
         def ReadIdHelper = load("src/main/resources/ReadIdHelper.groovy")
         
         //just get 1 service id
-        def serviceId = Integer.parseInt(ReadIdHelper.getServiceId2(listServiceReply))
+        serviceId = Integer.parseInt(ReadIdHelper.getServiceId2(listServiceReply))
         echo "serviceId ${serviceId}"
         
         if (serviceId > 0)

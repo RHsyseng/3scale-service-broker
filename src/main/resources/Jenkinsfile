@@ -6,6 +6,8 @@ node {
     def accessToken = "55044249b6efeaa6ff383df3ac3709824ba51f79438ef5aa57b134e381120c78"
     def ampURL = ""
     def serviceCurl = ""
+    def planId
+    def serviceId    
     def OC_HOME = "/home/czhu/works/ocClient"    
     
     
@@ -267,6 +269,17 @@ node {
                 currentBuild.result = 'FAILURE'
             }else{
                 echo "Good result, passed!"
+                //get the planId from the catalog, which will be used in the testing of secured market, just pick the last one
+                def tmpStr = "\"plans\":[{\"id\":\""
+                def i = result.lastIndexOf(tmpStr);
+                def j = result.	indexOf("\"",i +  tmpStr.length())
+                planId = result.substring(i +  tmpStr.length(),j)
+                echo "planId: ${planId}"
+                
+                def f = i - 2
+                def e = result.lastIndexOf("\"",f-1);
+                serviceId = result.substring(e+1,f)
+                echo "serviceId: ${serviceId}"
             }
  
         }        
@@ -274,7 +287,7 @@ node {
         println("---------------------------------- Test1: getCatalog is finished ----------------------------------")
     }    
     
-    stage ('Test provisionSecuredServices') {
+    stage ('Test2: provisionSecureServices') {
         //Test provisionSecuredServices with instance id = 123
         println("---------------------------------- Test provisionSecuredServices  ----------------------------------")
             
@@ -298,9 +311,34 @@ node {
         }else{
             echo "good result, passed"
         }
-        println("---------------------------------- Test provisionSecuredServices is finished ----------------------------------")
+        println("---------------------------------- Test2: provisionSecureServices is finished ----------------------------------")
  
     }        
     
+    stage ('Test3: provisionSecuredMarket') {
+        //Test provisionSecuredServices with instance id = 123
+        println("---------------------------------- Test provisionSecuredMarket  ----------------------------------")
+            
+        //do a deprovisioning first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
+        //without deprovisioning first it might also failed because same name exists at 3 scale side. 
+        sh "curl  -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/5555?plan_id=secure-service-plan-id&service_id=secure-service-id\""
+        
+        def result = sh (
+            script: "curl  -H \"Content-Type: application/json\" -X PUT -d '{\"context\":{\"platform\":\"ocp\",\"namespace\":\"some-namespace\"},\"service_id\":${serviceId},\"plan_id\":${planId},\"organization_guid\":\"org-guid-here\",\"space_guid\":\"space-guid-here\",\"parameters\":{\"applicationName\":\"testSecuredMarketApp\",\"description\":\"testSecuredMarketApp\"}}'  http://test.broker.com/v2/service_instances/5555",
+            returnStdout: true
+        ).trim()    
+        echo "curl result: ${result}"   
+            
+        def expectWords = "/?user_key="
+        if (!result.contains(expectWords)){
+            echo "result didn't contain following expect words: ${expectWords} "
+            currentBuild.result = 'FAILURE'
+        }else{
+            echo "good result, passed"
+        }
+        println("---------------------------------- Test2: provisionSecuredMarket is finished ----------------------------------")
+ 
+    }      
+
     
 }

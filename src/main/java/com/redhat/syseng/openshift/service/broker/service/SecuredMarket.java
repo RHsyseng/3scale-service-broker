@@ -46,8 +46,8 @@ public class SecuredMarket {
         logger.info("provision.getPlan_id() : " + provision.getPlan_id());
         logger.info("provision.getParameters().getApplicationName() : " + (String) inputParameters.get("applicationName"));
         logger.info("provision.getParameters().getDescription() : " + (String) inputParameters.get("description"));
-        */
-        
+         */
+
         PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String applicationId = "";
 
@@ -55,10 +55,9 @@ public class SecuredMarket {
 
         if (userKey.equals("")) {
             //create new Application to use the Plan, which will generate a new user_key
-            String desc = (String) inputParameters.get("description");
             ServiceParameters sp = new ServiceParameters();
             sp.setName((String) inputParameters.get("applicationName"));
-            sp.setDescription(desc);
+            sp.setDescription((String) inputParameters.get("description"));
             sp.setPlan_id(provision.getPlan_id());
 
             //after this step, in the API Integration page, the user_key will automatically replaced with the new one created below

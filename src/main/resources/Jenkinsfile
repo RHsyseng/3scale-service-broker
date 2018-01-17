@@ -293,7 +293,7 @@ node {
             
         //do a deprovisioning first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
         //without deprovisioning first it might also failed because same service name exists at 3 scale side. 
-
+        //test instance id: 123
         sh "curl  -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/123?plan_id=secure-service-plan-id&service_id=secure-service-id\""
       
         
@@ -321,6 +321,7 @@ node {
             
         //do a deprovisioning first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
         //without deprovisioning first it might also failed because same name exists at 3 scale side. 
+        //test instance id: 5555
         sh "curl  -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/5555?plan_id=secure-service-plan-id&service_id=secure-service-id\""
         
         def result = sh (
@@ -337,6 +338,31 @@ node {
             echo "good result, passed"
         }
         println("---------------------------------- Test3: provisionSecuredMarket is finished ----------------------------------")
+    }      
+    
+    stage ('Test4: BindingForSecuredMarket') {
+        //Test provisionSecuredServices with instance id = 123
+        println("---------------------------------- Test4: BindingForSecuredMarket  ----------------------------------")
+            
+        //do a unbinding first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
+        //test instance id: 8888, binding id: 9999, note we didn't really use binding id anyway.
+        sh "curl  -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/8888/service_bindings/9999\""
+        
+        def result = sh (
+            script: "curl  -H \"Content-Type: application/json\" -X PUT -d '{\"service_id\":${serviceId},\"plan_id\":${planId},\"bind_resource\": {\"app_guid\": \"app-guid-here\"}}'  http://test.broker.com/v2/service_instances/8888/service_bindings/9999",
+            returnStdout: true
+        ).trim()    
+        echo "curl result: ${result}"   
+            
+        def expectWords = "user_key"
+        if (!result.contains(expectWords)){
+            echo "result didn't contain following expect words: ${expectWords} "
+            currentBuild.result = 'FAILURE'
+        }else{
+            echo "good result, passed"
+        }
+        println("---------------------------------- Test4: BindingForSecuredMarket is finished ----------------------------------")
+ 
     }      
 
     

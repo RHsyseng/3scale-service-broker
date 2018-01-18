@@ -132,6 +132,9 @@ public class ThreeScaleBroker {
 //            return new BindingResult(null);
 //        }
 
+        //Note: Because 2 other brokers (Setup the AMP configuration broker and secure Service broker) don't allow binding
+        //so this binding here is only for Secured Market Broker
+
         //Note: 1) OCP spawns multi thread for the binding
         //2) And if only first result return the user_key, URL, but the other return null, then in OCP console, the secret is set to empty
         //3) Since the securedMarket binding is read-only, it can be executed multiple times

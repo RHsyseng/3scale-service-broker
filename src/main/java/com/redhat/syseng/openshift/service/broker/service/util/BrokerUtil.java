@@ -81,16 +81,7 @@ public class BrokerUtil {
             RestClientRequestFilter filter = new RestClientRequestFilter();
             client.register(filter);
         } else {
-            String allowAllCertification = System.getenv("DISABLE_TRUST_MANAGER");
-            if (allowAllCertification == null || !allowAllCertification.equals("true")) {
-                client = new ResteasyClientBuilder().build();
-            } else {
-                //This is disableTrustManager() for local swam testing only, which equals to "curl -k or --insecure option"
-                //by default it shouldn't be set to true
-                logger.warning("allowAllCertification is set to true!!!!!!");
-                client = new ResteasyClientBuilder().disableTrustManager().build();
-            }
-
+            client = new ResteasyClientBuilder().build();
         }
         return client;
     }

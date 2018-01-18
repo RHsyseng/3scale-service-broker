@@ -3,13 +3,15 @@
 
 node { 
 
-    def accessToken = "55044249b6efeaa6ff383df3ac3709824ba51f79438ef5aa57b134e381120c78"
     def ampURL = ""
     def serviceCurl = ""
     def planId
     def serviceId    
     def OC_HOME = "/home/czhu/works/ocClient"    
-    
+    def accessToken
+    withCredentials([string(credentialsId: '3SCALE_ACCESS_TOKEN', variable: 'token')]) {
+        accessToken = token
+    }    
     
     stage ('Clean 3scale services') {
         println("------------------------------------------------------- Clean 3scale services  -------------------------------------------------------")

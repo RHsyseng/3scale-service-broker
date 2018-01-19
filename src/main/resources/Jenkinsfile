@@ -7,7 +7,8 @@ node {
     def serviceCurl = ""
     def planId
     def serviceId    
-    def OC_HOME = "/home/czhu/works/ocClient"    
+    def OC_HOME = "/usr/bin"     
+    //def OC_HOME = "/home/czhu/works/ocClient"    
     def accessToken
     withCredentials([string(credentialsId: '3SCALE_ACCESS_TOKEN', variable: 'token')]) {
         accessToken = token

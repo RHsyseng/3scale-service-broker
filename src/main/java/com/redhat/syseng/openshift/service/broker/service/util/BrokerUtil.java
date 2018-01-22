@@ -73,8 +73,8 @@ public class BrokerUtil {
             }
 
             //use filter to add http header
-            RestClientRequestFilter filter = new RestClientRequestFilter();
-            client.register(filter);
+            //RestClientRequestFilter filter = new RestClientRequestFilter();
+            //client.register(filter);
         } else {
             client = new ResteasyClientBuilder().build();
         }

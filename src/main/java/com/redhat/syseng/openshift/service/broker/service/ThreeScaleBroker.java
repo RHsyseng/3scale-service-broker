@@ -80,13 +80,13 @@ public class ThreeScaleBroker {
     public synchronized Result provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException, SQLException, ClassNotFoundException {
         logger.info("Provisioning " + instance_id + " with data " + provision);
         Persistence persistence = Persistence.getInstance();
-        Result result = new Result("task_10", null, null);
+        Result result = null;
 
         //Add this check here because for one provision request, OCP spawns mulitple threads, added this "if else check" to make sure only the 1st one go through and recorded
         //otherwise it might cause primary key violation issue in database since the instance ID is PK. 
         if (!persistence.isProvisionInfoExist(instance_id)) {
             if (provision.getParameters().containsKey("input_url")) {
-
+                //This is the provision for SecureService 
                 result = new ServiceSecurer().provisioningForSecureService(instance_id, provision);
                 provision.setService_id(result.getServiceId());
 
@@ -100,16 +100,20 @@ public class ThreeScaleBroker {
                 platformConfig.setUseOcpCertificate((Boolean) parameters.get("use_OCP_certification"));
                 String configurationName = (String) parameters.get("configuration_name");
                 logger.info(configurationName + ": " + platformConfig);
-
+                
+                //for setup AMP configuration provision, no backend, so just return an dummy result to indicate it finished.
+                result = new Result("task_10", null, null);
                 persistence.setConfiguration(instance_id, configurationName, platformConfig);
 
             } else {
+                //This is the provision for SecuredMarket 
                 result = new SecuredMarket().provision(instance_id, provision);
                 Map<String, Object> parameters = provision.getParameters();
                 parameters.put("applicationId", result.getAppliationId());
             }
             persistence.persistProvisionInfo(instance_id, provision);
             //logger.info("persist provision : " + persistence.retrieveProvisionInfo(instance_id).toString());
+
             logger.info("provision.result: " + result);
 
         } else {

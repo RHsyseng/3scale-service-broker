@@ -40,7 +40,7 @@ public class ThreeScaleBroker {
 
     @GET
     @Path("/catalog")
-    @Produces({MediaType.APPLICATION_JSON})
+    @Produces(MediaType.APPLICATION_JSON)
     public Catalog getCatalog(@HeaderParam("X-Broker-Api-Version") String version) throws IOException, JAXBException, URISyntaxException {
         logger.info("Catalog called by version " + version);
         Persistence persistence = Persistence.getInstance();
@@ -75,8 +75,8 @@ public class ThreeScaleBroker {
 
     @PUT
     @Path("/service_instances/{instance_id}")
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     public synchronized Result provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException, SQLException, ClassNotFoundException {
         logger.info("Provisioning " + instance_id + " with data " + provision);
         Persistence persistence = Persistence.getInstance();
@@ -122,16 +122,9 @@ public class ThreeScaleBroker {
     
     @PUT
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding, @Context final HttpServletResponse response) throws URISyntaxException {
-// Don't remember why this "WebApplicationException" was added, might not be needed, took it out for now
-//try {
-//        } catch (WebApplicationException e) {
-//            response.setStatus(410);
-//            return new BindingResult(null);
-//        }
-
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding) throws URISyntaxException {
         //Note: Because 2 other brokers (Setup the AMP configuration broker and secure Service broker) don't allow binding
         //so this binding here is only for Secured Market Broker
 
@@ -151,28 +144,6 @@ public class ThreeScaleBroker {
         return result;
     }
 
-
-    /*
-    @PUT
-    @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding, @Context final HttpServletResponse response) throws URISyntaxException {
-        try {
-
-            logger.info("!!!!!!!!!!!!!!!!!!!!!!!!!!binding: " + binding.toString());
-            BindingResult result = new SecuredMarket().binding(binding);
-            logger.info("binding.result : " + result);
-            Persistence persistence = Persistence.getInstance();
-            persistence.persistBindingInfo(instance_id, binding);
-            return result;
-        } catch (WebApplicationException e) {
-            response.setStatus(410);
-            return new BindingResult(null);
-        }
-    }    
-*/
-    
     @DELETE
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Produces({MediaType.APPLICATION_JSON})

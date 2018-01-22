@@ -33,6 +33,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.util.logging.Level;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -41,13 +42,11 @@ public class BrokerUtil {
     private static Logger logger = Logger.getLogger(BrokerUtil.class.getName());
 
     private static ResteasyClient createRestClientWithCerts(boolean useOcpCertificate) {
-        ResteasyClient client = null;
+        ResteasyClient client;
 
         if (useOcpCertificate) {
             //use the OCP certificate which exist here in every pod: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-            FileInputStream in = null;
-            try {
-                in = new FileInputStream("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt");
+            try (FileInputStream in = new FileInputStream("/var/run/secrets/kubernetes.io/serviceaccount/ca.crt")) {
 
                 CertificateFactory cf = CertificateFactory.getInstance("X.509");
                 Certificate cert = cf.generateCertificate(in);
@@ -67,13 +66,9 @@ public class BrokerUtil {
                 ResteasyClientBuilder clientBuilder = new ResteasyClientBuilder();
                 clientBuilder.sslContext(ctx);
                 client = clientBuilder.build();
-
-                if (in != null) {
-                    in.close();
-                }
-
-            } catch (CertificateException | IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException ex) {
-                Logger.getLogger(BrokerUtil.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (CertificateException | IOException | KeyStoreException | NoSuchAlgorithmException | KeyManagementException
+                    ex) {
+                logger.log(Level.SEVERE, null, ex);
                 throw new IllegalStateException(ex);
             }
 
@@ -98,8 +93,8 @@ public class BrokerUtil {
 
         URIBuilder uriBuilder = getUriBuilder();
         String url = uriBuilder.build().toString();
-        ResteasyWebTarget rtarget = client.target(url);
-        return rtarget.proxy(ThreeScaleApiService.class);
+        ResteasyWebTarget webTarget = client.target(url);
+        return webTarget.proxy(ThreeScaleApiService.class);
     }
 
     private static URIBuilder getUriBuilder(Object... path) {
@@ -127,12 +122,12 @@ public class BrokerUtil {
         return proxy.getEndpoint();
     }
 
-    public static String searchAnyUserKeyBasedOnServiceId(String serviceId) throws URISyntaxException {
+    private static String searchAnyUserKeyBasedOnServiceId(String serviceId) throws URISyntaxException {
         Applications applications = getThreeScaleApiService().listApplications();
         logger.info("searchAnyUserKeyBasedOnServiceId: " + applications);
 
         String userKey = "";
-        for (Application application : applications.getApplication()) {
+        for (Application application : applications.getApplications()) {
             String svcId = String.valueOf(application.getServiceId());
             if (svcId.endsWith(serviceId)) {
                 userKey = application.getUserKey();
@@ -141,7 +136,6 @@ public class BrokerUtil {
         }
 
         return userKey;
-
     }
 
     public static String searchExistingApplicationBaseOnName(String applicationName, String accountId) throws URISyntaxException {
@@ -150,7 +144,7 @@ public class BrokerUtil {
         logger.info("searchExistingApplicationBaseOnName: " + applicationName);
 
         String userKey = "";
-        for (Application application : applications.getApplication()) {
+        for (Application application : applications.getApplications()) {
             String name = application.getName();
             if (name.equals(applicationName)) {
                 userKey = application.getUserKey();
@@ -168,7 +162,7 @@ public class BrokerUtil {
         logger.info("searchUserKeyBasedOnServiceAndPlanId: " + applications);
 
         String userKey = "";
-        for (Application application : applications.getApplication()) {
+        for (Application application : applications.getApplications()) {
             String svcId = String.valueOf(application.getServiceId());
             if (svcId.endsWith(serviceId)) {
                 Application.Plan plan = application.getPlan();

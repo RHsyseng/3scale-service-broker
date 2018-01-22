@@ -26,15 +26,7 @@ public class ServiceSecurer {
     {
         Map<String, Object> inputParameters = provision.getParameters();
 
-        logger.info("!!!!!!!!!!provisioning /service_instances/{instance_id} : " + instanceId);
-        /*
-        logger.info("provision.getService_id() : " + provision.getService_id());
-        logger.info("provision.getOrganization_guid() : " + provision.getOrganization_guid());
-        logger.info("provision.getParameters().getService_name() : " + (String) inputParameters.get("service_name"));
-        logger.info("provision.getParameters().getApplication_plan() : " + (String) inputParameters.get("application_plan"));
-        logger.info("provision.getParameters().getInput_url() : " + (String) inputParameters.get("input_url"));
-        logger.info("provision.getParameters().getApplication_name() : " + (String) inputParameters.get("application_name"));
-         */
+        logger.info("Provisioning /service_instances/" + instanceId);
 
         PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String url = searchServiceInstance((String) inputParameters.get("service_name"));
@@ -42,12 +34,6 @@ public class ServiceSecurer {
         String newServiceId = "";
         //no existing service, need to create one
         if ("".equals(url)) {
-
-            HashMap parameters = new HashMap();
-            parameters.put("name", (String) inputParameters.get("service_name"));
-            parameters.put("system_name", (String) inputParameters.get("service_name"));
-            parameters.put("description", "instance_id:" + instanceId);
-
             ServiceParameters sp = new ServiceParameters();
             sp.setName((String) inputParameters.get("service_name"));
             sp.setSystem_name((String) inputParameters.get("service_name"));
@@ -95,51 +81,12 @@ public class ServiceSecurer {
         return new Result("task_10", url, newServiceId);
     }
 
-    /*
-    public synchronized BindingResult binding(String inputStr) throws URISyntaxException {
-        logger.info("binding inputStr: " + inputStr);
-
-        //TODO: right now it seems binding couldn't accept input parameters defined in catalog, I generated random username and password for tetsing for now.
-        boolean useLetters = true;
-        boolean useNumbers = false;
-        String userName = "user_" + RandomStringUtils.random(4, useLetters, useNumbers);
-
-        useNumbers = true;
-        String passWord = RandomStringUtils.random(15, useLetters, useNumbers);
-        logger.info("binding userName: " + userName);
-        logger.info("binding passWord: " + passWord);
-
-        createUser(userName, passWord);
-        BindingResult result = new BindingResult(new BindingResult.Credentials("https://3scale.middleware.ocp.cloud.lab.eng.bos.redhat.com/login", userName, passWord));
-
-        logger.info("binding result: " + result);
-        return result;
-    }
-
-    private void createUser(String userName, String password) throws URISyntaxException {
-        String email = userName + "@example.com";
-        HashMap parameters = new HashMap();
-        parameters.put("username", userName);
-        parameters.put("password", password);
-        parameters.put("email", email);
-
-        Persistence persistence = Persistence.getInstance();
-        User user = getThreeScaleApiService().createUser(persistence.getAccountId(), parameters);
-        logger.info("user is created  : " + user.getId());
-
-        //now activate the new user, the default state is "pending"
-        parameters = new HashMap();
-        getThreeScaleApiService().activeUser(String.valueOf(persistence.getAccountId()), String.valueOf(user.getId()), parameters);
-        logger.info("user is activated");
-
-    }
-     */
     public void deProvisioning(String instanceId) throws URISyntaxException {
         Persistence persistence = Persistence.getInstance();
         String provisionInfo = persistence.retrieveProvisionInfo(instanceId);
         if (null != provisionInfo && !"".equals(provisionInfo)) {
             String serviceId = provisionInfo.substring(provisionInfo.indexOf("service_id='") + "service_id='".length(), provisionInfo.indexOf("', organization_guid"));
-            if (null != serviceId && !"".equals(serviceId)) {
+            if (!"".equals(serviceId)) {
                 try {
                     logger.info("ServiceSecurer.deProvisioning, before deleting serviceId from 3scale AMP : " + serviceId);
                     getThreeScaleApiService().deleteService(serviceId);

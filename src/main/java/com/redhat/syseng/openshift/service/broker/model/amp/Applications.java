@@ -54,7 +54,7 @@ public class Applications {
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
-     *    getApplication().add(newItem);
+     *    getApplications().add(newItem);
      * </pre>
      * 
      * 
@@ -64,9 +64,9 @@ public class Applications {
      * 
      * 
      */
-    public List<Application> getApplication() {
+    public List<Application> getApplications() {
         if (application == null) {
-            application = new ArrayList<Application>();
+            application = new ArrayList<>();
         }
         return this.application;
     }

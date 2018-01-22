@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.ws.rs.PathParam;
-import javax.xml.bind.JAXBException;
 
 import com.redhat.syseng.openshift.service.broker.model.Error;
 import com.redhat.syseng.openshift.service.broker.model.amp.Plans;
@@ -39,14 +38,6 @@ public class SecuredMarket {
 
     Result provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException {
         Map<String, Object> inputParameters = provision.getParameters();
-        /*
-        logger.info("!!!!!!!!!!provisioning /service_instances/{instance_id} : " + instance_id);
-        logger.info("provision.getOrganization_guid() : " + provision.getOrganization_guid());
-        logger.info("provision.getService_id() : " + provision.getService_id());
-        logger.info("provision.getPlan_id() : " + provision.getPlan_id());
-        logger.info("provision.getParameters().getApplicationName() : " + (String) inputParameters.get("applicationName"));
-        logger.info("provision.getParameters().getDescription() : " + (String) inputParameters.get("description"));
-         */
 
         PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
         String applicationId = "";
@@ -77,7 +68,7 @@ public class SecuredMarket {
         return result;
     }
 
-    Service[] getCatalog() throws JAXBException, URISyntaxException {
+    Service[] getCatalog() throws URISyntaxException {
         Services ampServices = getThreeScaleApiService().listServices();
         logger.info("AMP services: " + ampServices);
         List<Service> svcList = new ArrayList<>();
@@ -99,7 +90,7 @@ public class SecuredMarket {
         return svcList.toArray(new Service[svcList.size()]);
     }
 
-    private Plan[] readPlansForOneService(String serviceId) throws JAXBException, URISyntaxException {
+    private Plan[] readPlansForOneService(String serviceId) throws URISyntaxException {
         //call the Application PLan List function
         Plans plans = getThreeScaleApiService().listApplicationPlan(serviceId);
         logger.info("AMP plans: " + plans);
@@ -111,7 +102,7 @@ public class SecuredMarket {
             //need to convert to lowercase, otherwise this error in getCatalog: 
             //ClusterServicePlan.servicecatalog.k8s.io "6" is invalid: spec.externalName: Invalid value: "Basic": [-a-z0-9]+ (regex used for validation is 'plan-name-40d-0983-1b89')
             String planName = ampPlan.getName();
-            logger.info("!!!!!!!!!!!!!!!!!! lower the case for ampPlan.getName()" + planName);
+            logger.info("Change ampPlan.getName() " + planName + " to lowercase");
             planName = planName.toLowerCase();
             plan.setName(planName);
 
@@ -160,31 +151,6 @@ public class SecuredMarket {
         return planList.toArray(new Plan[planList.size()]);
     }
 
-    /*
-    BindingResult binding(String inputStr) throws URISyntaxException {
-        //public String binding(@PathParam("instance_id") String instance_id, @PathParam("binding_id") String binding_id) {
-        logger.info("binding inputStr: " + inputStr);
-        String guid = inputStr.substring(inputStr.indexOf("app_guid\":\"") + "app_guid\":\"".length(), inputStr.indexOf("\",\"plan_id"));
-        logger.info("binding guid: " + guid);
-        String planId = inputStr.substring(inputStr.indexOf("plan_id\":\"") + "plan_id\":\"".length(), inputStr.indexOf("\",\"service_id"));
-        logger.info("binding planId: " + planId);
-        String serviceId = inputStr.substring(inputStr.indexOf("service_id\":\"") + "service_id\":\"".length(), inputStr.indexOf("\",\"bind_resource"));
-        logger.info("binding serviceId: " + serviceId);
-
-        Persistence persistence = Persistence.getInstance();
-        String endpoint = BrokerUtil.searchEndPointBasedOnServiceId(serviceId);
-        if (endpoint == null) {
-            Error error = new Error(410, "Service ID " + serviceId + " not found!");
-            logger.severe("Failed to bind\n" + error);
-            throw error.asException();
-        } else {
-            String user_key = BrokerUtil.searchUserKeyBasedOnServiceAndPlanId(serviceId, planId, persistence.getAccountId());
-            BindingResult result = new BindingResult(new BindingResult.Credentials(endpoint, user_key));
-            logger.info("binding result:  " + result);
-            return result;
-        }
-    }
-     */
     BindingResult binding(Binding binding) throws URISyntaxException {
         String guid = binding.getBind_resource().getApp_guid();
         logger.info("binding guid: " + guid);
@@ -216,7 +182,7 @@ public class SecuredMarket {
             int i = provisionInfo.indexOf("applicationId=");
             //logger.info("SecuredMarket.deProvisioning(), i: " + i);
             String applicationId = provisionInfo.substring(i + "applicationId=".length(), provisionInfo.indexOf("}", i));
-            if (null != applicationId && !"".equals(applicationId)) {
+            if (!"".equals(applicationId)) {
                 logger.info("SecuredMarket.deProvisioning(), applicationId: " + applicationId);
                 getThreeScaleApiService().deleteApplication(platformConfig.getAccountId(), applicationId);
             }

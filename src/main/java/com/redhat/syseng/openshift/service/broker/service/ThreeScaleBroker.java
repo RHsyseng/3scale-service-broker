@@ -80,7 +80,7 @@ public class ThreeScaleBroker {
     public synchronized Result provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException, SQLException, ClassNotFoundException {
         logger.info("Provisioning " + instance_id + " with data " + provision);
         Persistence persistence = Persistence.getInstance();
-        Result result = null;
+        Result result;
 
         //Add this check here because for one provision request, OCP spawns mulitple threads, added this "if else check" to make sure only the 1st one go through and recorded
         //otherwise it might cause primary key violation issue in database since the instance ID is PK. 
@@ -118,6 +118,7 @@ public class ThreeScaleBroker {
 
         } else {
             logger.info("ProvisionInfo already exists, skip provision again");
+            result = new Result("task_10", null, null);
         }
 
         return result;

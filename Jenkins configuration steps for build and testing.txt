@@ -1,0 +1,39 @@
+Jenkins configuration steps for build and testing
+
+works on Local Jenkins installation, verison 2.99
+maven (version 3.3 used)
+Openshift Cli client for OCP 3.7
+
+Configuration in Jenkins
+1) Update plugin, needed: 
+Credentials Binding Plugin and Pipeline related plugin, like Pipeline Maven Integration Plugin
+
+2) create 3scale access credential
+Jenkins -> credential -> "Stores scoped to Jenkins", click on Jenkins -> "	Global credentials (unrestricted)"
+Add new one: 
+Kind: Secret text
+Scope: Global
+Secret: the access token of 3scale
+ID: 3SCALE_ACCESS_TOKEN
+
+3) config maven: manage Jenkins -> Global Tool Configuration -> add maven
+Name: maven
+MAVEN_HOME: point to maven home at os level.
+
+4) config pipeline
+new item -> Pipeline with name "BrokerPipeline"
+Then input these 4 values for the pipeline section
+Definition: choose "Pipeline script from SCM"
+SCM: Git
+Repository URL: https://github.com/RHsyseng/3scale-service-broker.git
+Script Path: src/main/resources/Jenkinsfile
+
+5) Run the build, it will fail a few times, because the groovy methods used in scripts to be approved first. And unfortunately they can only be added one-by-one after each failure.
+To approve: Manage Jenkins -> In-process Script Approval
+These are the signatures need to be approved 
+    method java.lang.String indexOf java.lang.String int
+    method java.lang.String lastIndexOf java.lang.String int
+    new java.io.File java.lang.String
+    new java.lang.Integer java.lang.String
+    staticMethod org.codehaus.groovy.runtime.DefaultGroovyMethods getText java.io.File
+

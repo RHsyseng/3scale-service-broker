@@ -23,8 +23,18 @@ public class Service {
     private Map<String, Object> metadata;
 
     private boolean bindable;
+    
+    private boolean plan_updateable;    
 
     private String[] requires;
+
+    public boolean isPlan_updateable() {
+        return plan_updateable;
+    }
+
+    public void setPlan_updateable(boolean plan_updateable) {
+        this.plan_updateable = plan_updateable;
+    }
 
     public String getId() {
         return id;

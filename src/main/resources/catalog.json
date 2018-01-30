@@ -6,6 +6,7 @@
     "route_forwarding"
   ],
   "bindable": false,
+  "plan_updateable":false,
   "metadata": {
     "displayName": "secure-service-3scale",
     "documentationUrl": "https://github.com/RHsyseng/3scale-service-broker",

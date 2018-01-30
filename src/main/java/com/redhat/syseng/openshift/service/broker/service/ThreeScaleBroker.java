@@ -8,7 +8,6 @@ import java.sql.SQLException;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -18,7 +17,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBException;
 
@@ -31,10 +29,25 @@ import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
 import com.redhat.syseng.openshift.service.broker.persistence.Persistence;
 import com.redhat.syseng.openshift.service.broker.persistence.PlatformConfig;
-import javax.ws.rs.WebApplicationException;
 
 @Path("/v2")
 public class ThreeScaleBroker {
+    
+    /**
+    *This is the main broker, which act as facade for the detail implementation of SeviceSecure broker and SecuredMarket broker
+    * 1) There is no need to implement Asynchronous Operations since all the work just talk to back end 3scale AMP through RESTful 
+    * web service call, all request can be finished in a timely manner. 
+    * 
+    * 2) Because it's synchronous operation, no need to implement Polling Last Operation from spec. 
+    * 
+    * 3) The operation this broker implements are: 
+    * Provisioning
+    * Deprovisioning
+    * Binding and Unbinding (just for SecuredMarket broker)
+    * Updating
+    *
+    * 
+    */
 
     private Logger logger = Logger.getLogger(getClass().getName());
 

@@ -78,6 +78,7 @@ public class SecuredMarket {
             svc.setDescription(service.getName());
             svc.setName(service.getSystemName());
             svc.setBindable(true);
+            svc.setPlan_updateable(true);
             svc.setPlans(readPlansForOneService(svc.getId()));
             Map<String, Object> metadata = new HashMap<>();
             metadata.put("displayName", "secured-service-market: " + svc.getDescription());

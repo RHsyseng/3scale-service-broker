@@ -228,13 +228,10 @@ public class ThreeScaleBroker {
         logger.info("updateServiceInstance, instance_id:" + instanceId);
         logger.info("updateServiceInstance, service_id:" + updateObject.getService_id());
         logger.info("updateServiceInstance, plan_id:" + updateObject.getPlan_id());
-        UpdateResult result = new SecuredMarket().updateServiceInstance(instanceId, updateObject);
         
-        if (result.getStatus().equals("success")){
-            //need to update the new plan id in the provision table
-                Persistence persistence = Persistence.getInstance();
-                //persistence.
-        }
+        //Please note the persistency of the request is inside the updateServiceInstance
+        //and the record is: 1) persist to the provision table 2) only persist when there is update.
+        UpdateResult result = new SecuredMarket().updateServiceInstance(instanceId, updateObject);
         return result;
     }
 

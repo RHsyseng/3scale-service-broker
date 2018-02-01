@@ -174,7 +174,13 @@ node {
         def planName = "smallPizza"
         serviceCurl = "curl -v -k -X POST -d \"access_token=" + accessToken + "&name=" + planName + "\" \"https://3scale-admin.middleware.ocp.cloud.lab.eng.bos.redhat.com/admin/api/services/" + serviceId + "/application_plans.xml\"  > out_createApplicationPlan.txt "
         //echo " serviceCurl: ${serviceCurl}"
+        sh "${serviceCurl}"
+        
+        planName = "largePizza"
+        serviceCurl = "curl -v -k -X POST -d \"access_token=" + accessToken + "&name=" + planName + "\" \"https://3scale-admin.middleware.ocp.cloud.lab.eng.bos.redhat.com/admin/api/services/" + serviceId + "/application_plans.xml\"  > out_createApplicationPlan.txt "
+        //echo " serviceCurl: ${serviceCurl}"
         sh "${serviceCurl}"      
+        
 
         def createPlanReply = new File("${WORKSPACE}/out_createApplicationPlan.txt").text
         planId = ReadIdHelper.getPlanId(createPlanReply)

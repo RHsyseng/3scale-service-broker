@@ -26,6 +26,8 @@ import com.redhat.syseng.openshift.service.broker.model.catalog.ServiceInstance;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
 import com.redhat.syseng.openshift.service.broker.model.service.ServiceParameters;
+import com.redhat.syseng.openshift.service.broker.model.update.UpdateObject;
+import com.redhat.syseng.openshift.service.broker.model.update.UpdateResult;
 import com.redhat.syseng.openshift.service.broker.persistence.Persistence;
 import com.redhat.syseng.openshift.service.broker.persistence.PlatformConfig;
 import com.redhat.syseng.openshift.service.broker.service.util.BrokerUtil;
@@ -188,6 +190,59 @@ public class SecuredMarket {
                 getThreeScaleApiService().deleteApplication(platformConfig.getAccountId(), applicationId);
             }
         }
+    }
+
+    /*
+     * For the same instanceId, compare the new planId with the planId in the
+     * provision table, if it's the same, do nothing, 
+     * else just update the application to use the new plan
+     */
+    public UpdateResult updateServiceInstance(String instanceId, UpdateObject updateObject) throws URISyntaxException {
+        UpdateResult result = new UpdateResult();
+        Persistence persistence = Persistence.getInstance();
+
+        String provisionInfo = persistence.retrieveProvisionInfo(instanceId);
+        if (null != provisionInfo && !"".equals(provisionInfo)) {
+            logger.info("SecuredMarket.updateServiceInstance(), provisionInfo: " + provisionInfo);
+
+            int j = provisionInfo.indexOf("plan_id='");
+            String existingPlanId = provisionInfo.substring(j + "plan_id='".length(), provisionInfo.indexOf("'", j + "plan_id='".length()));
+            logger.info("SecuredMarket.updateServiceInstance(), existingPlanId: " + existingPlanId);
+            if (!existingPlanId.equals(updateObject.getPlan_id())) {
+                //need to update application plan based on applicationId
+                int i = provisionInfo.indexOf("applicationId=");
+
+                String applicationId = provisionInfo.substring(i + "applicationId=".length(), provisionInfo.indexOf("}", i));
+                if (!"".equals(applicationId)) {
+                    logger.info("SecuredMarket.updateServiceInstance(), applicationId: " + applicationId);
+                    ServiceParameters sp = new ServiceParameters();
+                    sp.setPlan_id(updateObject.getPlan_id());
+                    getThreeScaleApiService().changeApplicationPlan(persistence.getPlatformConfig().getAccountId(), applicationId, sp);
+                    result.setStatus("success");
+                    
+                    String oldPlanString = "plan_id='" + existingPlanId + "'";
+                    String newPlanString = "plan_id='" + updateObject.getPlan_id() + "'";
+                    String newProvisionInfo = provisionInfo.replace(oldPlanString, newPlanString);
+                    persistence.updateProvisionInfo(instanceId, newProvisionInfo);
+                    logger.info("SecuredMarket.updateServiceInstance(), updated old plan in 3scale AMP and persistence");
+                }
+
+            } else {
+                String status = "no need to update, plan id is the same: " + existingPlanId;
+                logger.info(status);
+                result.setStatus(status);
+            }
+
+        } else {
+                String status = "no need to update, couldn't find existing instance with same instance id: " + instanceId;
+                logger.info(status);
+                result.setStatus(status);
+        }
+        
+        
+
+        
+        return result;
     }
 
 }

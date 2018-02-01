@@ -27,28 +27,30 @@ import com.redhat.syseng.openshift.service.broker.model.catalog.Catalog;
 import com.redhat.syseng.openshift.service.broker.model.catalog.Service;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
 import com.redhat.syseng.openshift.service.broker.model.provision.Result;
+import com.redhat.syseng.openshift.service.broker.model.update.UpdateObject;
+import com.redhat.syseng.openshift.service.broker.model.update.UpdateResult;
 import com.redhat.syseng.openshift.service.broker.persistence.Persistence;
 import com.redhat.syseng.openshift.service.broker.persistence.PlatformConfig;
+import com.redhat.syseng.openshift.service.broker.service.util.PATCH;
 
 @Path("/v2")
 public class ThreeScaleBroker {
-    
-    /**
-    *This is the main broker, which act as facade for the detail implementation of SeviceSecure broker and SecuredMarket broker
-    * 1) There is no need to implement Asynchronous Operations since all the work just talk to back end 3scale AMP through RESTful 
-    * web service call, all request can be finished in a timely manner. 
-    * 
-    * 2) Because it's synchronous operation, no need to implement Polling Last Operation from spec. 
-    * 
-    * 3) The operation this broker implements are: 
-    * Provisioning
-    * Deprovisioning
-    * Binding and Unbinding (just for SecuredMarket broker)
-    * Updating
-    *
-    * 
-    */
 
+    /**
+     * This is the main broker, which act as facade for the detail
+     * implementation of SeviceSecure broker and SecuredMarket broker 1) There
+     * is no need to implement Asynchronous Operations since all the work just
+     * talk to back end 3scale AMP through RESTful web service call, all request
+     * can be finished in a timely manner.
+     *
+     * 2) Because it's synchronous operation, no need to implement Polling Last
+     * Operation from spec.
+     *
+     * 3) The operation this broker implements are: Provisioning Deprovisioning
+     * Binding and Unbinding (just for SecuredMarket broker) Updating
+     *
+     *
+     */
     private Logger logger = Logger.getLogger(getClass().getName());
 
     @GET
@@ -113,7 +115,7 @@ public class ThreeScaleBroker {
                 platformConfig.setUseOcpCertificate((Boolean) parameters.get("use_OCP_certification"));
                 String configurationName = (String) parameters.get("configuration_name");
                 logger.info(configurationName + ": " + platformConfig);
-                
+
                 //for setup AMP configuration provision, no backend, so just return an dummy result to indicate it finished.
                 result = new Result("task_10", null, null);
                 persistence.setConfiguration(instance_id, configurationName, platformConfig);
@@ -135,44 +137,6 @@ public class ThreeScaleBroker {
         }
 
         return result;
-    }
-
-    
-    @PUT
-    @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding) throws URISyntaxException {
-        //Note: Because 2 other brokers (Setup the AMP configuration broker and secure Service broker) don't allow binding
-        //so this binding here is only for Secured Market Broker
-
-        //Note: 1) OCP spawns multi thread for the binding
-        //2) And if only first result return the user_key, URL, but the other return null, then in OCP console, the secret is set to empty
-        //3) Since the securedMarket binding is read-only, it can be executed multiple times
-        //4) So let it run, only limit the persist binding info for the 1st request to avoid DB exception in the log. 
-        Persistence persistence = Persistence.getInstance();
-        BindingResult result = new SecuredMarket().binding(binding);
-        logger.info("binding.result : " + result);        
-        if (!persistence.isBindingInfoExist(instance_id)) {
-            persistence.persistBindingInfo(instance_id, binding);
-            logger.info("persist binding for this instance_id : " + instance_id);             
-        } else {
-            logger.info("Skip persistence because binding already exists for this instance_id: " + instance_id);
-        }
-        return result;
-    }
-
-    @DELETE
-    @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
-    @Produces({MediaType.APPLICATION_JSON})
-    public synchronized BindingResult unBinding(@PathParam("instance_id") String instanceId, @PathParam("binding_id") String bindingId) {
-        //Since for configurationAMP and serviceSecure there are no binding
-        //and for securedMarket binding, it doesn't really create anything in 3scale AMP, just return URL and user_key, 
-        //so nothing need to be deleted for unbinding at 3scale side, just delete the binding info from persistence.
-        Persistence persistence = Persistence.getInstance();
-        persistence.deleteBindingInfo(instanceId);
-        logger.info("unBinding finished, instance_id:" + instanceId + ", binding_id: " + bindingId);
-        return new BindingResult(null);
     }
 
     @DELETE
@@ -198,11 +162,80 @@ public class ThreeScaleBroker {
             logger.info("deProvisioning for secured market, will delete the application from 3scale AMP");
             new SecuredMarket().deProvisioning(instanceId);
         }
-         logger.info("now delete the provisioning info from persistence layer");
+        logger.info("now delete the provisioning info from persistence layer");
         persistence.deleteProvisionInfo(instanceId);
-         logger.info("Provisioning is deleted from persistence, deProvisioning finished ");
-        
+        logger.info("Provisioning is deleted from persistence, deProvisioning finished ");
+
         return new Result(null, null, null);
 
     }
+
+    /**
+     * Note: Because 2 other brokers (configureAMP broker and serviceSecure
+     * broker) don't allow binding so this binding here is only for securedMarket Broker
+     *
+     * Note: 1) OCP spawns multi thread for the binding 2) And if only first
+     * result return the user_key, URL, but the other return null, then in OCP
+     * console, the secret is set to empty 3) Since the securedMarket binding is
+     * read-only, it can be executed multiple times 4) So let it run, only limit
+     * the persist binding info for the 1st request to avoid DB exception in the
+     * log.
+     */
+    @PUT
+    @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding) throws URISyntaxException {
+        Persistence persistence = Persistence.getInstance();
+        BindingResult result = new SecuredMarket().binding(binding);
+        logger.info("binding.result : " + result);
+        if (!persistence.isBindingInfoExist(instance_id)) {
+            persistence.persistBindingInfo(instance_id, binding);
+            logger.info("persist binding for this instance_id : " + instance_id);
+        } else {
+            logger.info("Skip persistence because binding already exists for this instance_id: " + instance_id);
+        }
+        return result;
+    }
+
+    /**
+     * Since for configureAMP and serviceSecure there are no binding and for
+     * securedMarket binding, it doesn't really create anything in 3scale AMP,
+     * just return URL and user_key, so nothing need to be deleted for unbinding
+     * at 3scale side, just delete the binding info from persistence.
+     */
+    @DELETE
+    @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public synchronized BindingResult unBinding(@PathParam("instance_id") String instanceId, @PathParam("binding_id") String bindingId) {
+
+        Persistence persistence = Persistence.getInstance();
+        persistence.deleteBindingInfo(instanceId);
+        logger.info("unBinding finished, instance_id:" + instanceId + ", binding_id: " + bindingId);
+        return new BindingResult(null);
+    }
+
+    /**
+     * UpdateSerivceInstance only targets securedMarket broker, because 2 other
+     * brokers (configureAMP broker and serviceSecure broker) doesn't have more
+     * than one plan to choose from
+     */
+    @PATCH
+    @Path("/service_instances/{instance_id}")
+    @Produces({MediaType.APPLICATION_JSON})
+    public synchronized UpdateResult updateServiceInstance(@PathParam("instance_id") String instanceId, UpdateObject updateObject) throws URISyntaxException{
+
+        logger.info("updateServiceInstance, instance_id:" + instanceId);
+        logger.info("updateServiceInstance, service_id:" + updateObject.getService_id());
+        logger.info("updateServiceInstance, plan_id:" + updateObject.getPlan_id());
+        UpdateResult result = new SecuredMarket().updateServiceInstance(instanceId, updateObject);
+        
+        if (result.getStatus().equals("success")){
+            //need to update the new plan id in the provision table
+                Persistence persistence = Persistence.getInstance();
+                //persistence.
+        }
+        return result;
+    }
+
 }

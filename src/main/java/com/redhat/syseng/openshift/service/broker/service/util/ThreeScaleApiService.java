@@ -21,6 +21,7 @@ import com.redhat.syseng.openshift.service.broker.model.amp.MappingRule;
 import com.redhat.syseng.openshift.service.broker.model.service.MappingRulesParameters;
 import com.redhat.syseng.openshift.service.broker.model.service.ServiceParameters;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.PUT;
 
 
 public interface ThreeScaleApiService {
@@ -87,6 +88,12 @@ public interface ThreeScaleApiService {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     void deleteApplication(@PathParam("accountId") String accountId, @PathParam("id") String id);
+
+    @PUT
+    @Path("/admin/api/accounts/{accountId}/applications/{id}/change_plan.xml")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    void changeApplicationPlan(@PathParam("accountId") String accountId, @PathParam("id") String id, ServiceParameters sp);
 
     @GET
     @Path("/admin/api/services/{serviceId}/proxy.xml")

@@ -200,6 +200,33 @@ public class Persistence {
         logger.info("persistProvisionInfo: instanceId" + instanceId + " provision: " + provision.toString());
 
     }
+    
+    public void updateProvisionInfo(String instanceId, Object provision) {
+
+        Connection connection = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection(SQLITE_DB_URL);
+            //connection.setAutoCommit(false);
+            //logger.info("persistProvisionInfo Opened database successfully");
+
+            stmt = connection.createStatement();
+            stmt.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            String sqlString = "update PROVISION_TABLE set provision_info =\"" + provision.toString() + "\" where instance_id =\""+ instanceId + "\";";
+            logger.info("update string: " + sqlString);
+            stmt.executeUpdate(sqlString);
+            //connection.commit();
+            stmt.close();
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException(e);
+        }
+        logger.info("persistProvisionInfo: instanceId" + instanceId + " provision: " + provision.toString());
+
+    }    
 
     public void deleteProvisionInfo(String instanceId) {
 

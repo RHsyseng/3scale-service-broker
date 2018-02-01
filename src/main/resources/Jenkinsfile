@@ -6,6 +6,7 @@ node {
     def ampURL = ""
     def serviceCurl = ""
     def planId
+    def planId2
     def serviceId    
     def OC_HOME = "/usr/bin"     
     //def OC_HOME = "/home/czhu/works/ocClient"    
@@ -278,6 +279,7 @@ node {
                 currentBuild.result = 'FAILURE'
             }else{
                 echo "Good result, passed!"
+                
                 //get the planId from the catalog, which will be used in the testing of secured market, just pick the last one
                 def tmpStr = "\"plans\":[{\"id\":\""
                 def i = result.lastIndexOf(tmpStr);
@@ -285,6 +287,12 @@ node {
                 planId = result.substring(i +  tmpStr.length(),j)
                 echo "planId: ${planId}"
                 
+                tmpStr = "\"id\":\""
+                def k = result.indexOf(tmpStr,i+30)
+                def g = result.indexOf("\"", k + tmpStr.length())
+                planId2 = result.substring(k +  tmpStr.length(),g)
+                echo "planId2: ${planId2}"
+
                 def f = i - 2
                 def e = result.lastIndexOf("\"",f-1);
                 serviceId = result.substring(e+1,f)
@@ -372,5 +380,26 @@ node {
  
     }      
 
+    stage ('Test5: updateServiceInstance') {
+        println("---------------------------------- Test5: updateServiceInstance  ----------------------------------")
+            
+        //test instance id: 5555, note this need to be the same as test3's instance id because it's update based on this instance id
+        //test3 uses planId (smallPizza plan), while this will use planId2 to update it to (largePizza plan)
+        
+        def result = sh (
+            script: "curl  -H \"Content-Type: application/json\" -X PATCH -d '{\"service_id\":${serviceId},\"plan_id\":${planId2},\"context\":{\"platform\":\"ocp\",\"namespace\":\"some-namespace\"}}'  http://test.broker.com/v2/service_instances/5555",
+            returnStdout: true
+        ).trim()    
+        echo "curl result: ${result}"   
+            
+        def expectWords = "success"
+        if (!result.contains(expectWords)){
+            echo "result didn't contain following expect words: ${expectWords} "
+            currentBuild.result = 'FAILURE'
+        }else{
+            echo "good result, passed"
+        }
+        println("---------------------------------- Test5: updateServiceInstance is finished ----------------------------------")
+    }       
     
 }

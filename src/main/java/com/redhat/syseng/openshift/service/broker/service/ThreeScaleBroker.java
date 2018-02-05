@@ -52,12 +52,20 @@ public class ThreeScaleBroker {
      *
      */
     private Logger logger = Logger.getLogger(getClass().getName());
+    private final static String X_BROKER_API_VERSION = "2.13";
 
     @GET
     @Path("/catalog")
     @Produces(MediaType.APPLICATION_JSON)
     public Catalog getCatalog(@HeaderParam("X-Broker-Api-Version") String version) throws IOException, JAXBException, URISyntaxException {
-        logger.info("Catalog called by version " + version);
+        if (null == version) {
+            logger.warning("getCatalog, X-Broker-Api-Version is null!");
+        } else if (!X_BROKER_API_VERSION.equals(X_BROKER_API_VERSION)) {
+            logger.warning("getCatalog, request header X-Broker-Api-Version is " + version + ", this broker might not work properly, because it is built based on API version " + X_BROKER_API_VERSION);
+        } else {
+            logger.info("getCatalog, X-Broker-Api-Version: " + version);
+        }
+
         Persistence persistence = Persistence.getInstance();
         Catalog catalog = new Catalog();
         Service[] services;
@@ -92,7 +100,15 @@ public class ThreeScaleBroker {
     @Path("/service_instances/{instance_id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public synchronized Result provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException, SQLException, ClassNotFoundException {
+    public synchronized Result provision(@HeaderParam("X-Broker-Api-Version") String version, @PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException, SQLException, ClassNotFoundException {
+        if (null == version) {
+            logger.warning("provision, X-Broker-Api-Version is null!");
+        } else if (!X_BROKER_API_VERSION.equals(X_BROKER_API_VERSION)) {
+            logger.warning("provision, request header X-Broker-Api-Version is " + version + ", this broker might not work properly, because it is built based on API version " + X_BROKER_API_VERSION);
+        } else {
+            logger.info("provision, X-Broker-Api-Version: " + version);
+        }
+
         logger.info("Provisioning " + instance_id + " with data " + provision);
         Persistence persistence = Persistence.getInstance();
         Result result;
@@ -142,7 +158,15 @@ public class ThreeScaleBroker {
     @DELETE
     @Path("/service_instances/{instance_id}")
     @Produces({MediaType.APPLICATION_JSON})
-    public synchronized Result deProvisioning(@PathParam("instance_id") String instanceId, @QueryParam("service_id") String serviceId, @QueryParam("plan_id") String planId) throws URISyntaxException {
+    public synchronized Result deProvisioning(@HeaderParam("X-Broker-Api-Version") String version, @PathParam("instance_id") String instanceId, @QueryParam("service_id") String serviceId, @QueryParam("plan_id") String planId) throws URISyntaxException {
+        if (null == version) {
+            logger.warning("deProvisioning, X-Broker-Api-Version is null!");
+        } else if (!X_BROKER_API_VERSION.equals(X_BROKER_API_VERSION)) {
+            logger.warning("deProvisioning, request header X-Broker-Api-Version is " + version + ", this broker might not work properly, because it is built based on API version " + X_BROKER_API_VERSION);
+        } else {
+            logger.info("deProvisioning, X-Broker-Api-Version: " + version);
+        }
+        
         logger.info("deProvisioning instance_id: " + instanceId);
         logger.info("deProvisioning serviceId: " + serviceId);
         logger.info("deProvisioning planId: " + planId);
@@ -172,7 +196,8 @@ public class ThreeScaleBroker {
 
     /**
      * Note: Because 2 other brokers (configureAMP broker and serviceSecure
-     * broker) don't allow binding so this binding here is only for securedMarket Broker
+     * broker) don't allow binding so this binding here is only for
+     * securedMarket Broker
      *
      * Note: 1) OCP spawns multi thread for the binding 2) And if only first
      * result return the user_key, URL, but the other return null, then in OCP
@@ -185,7 +210,15 @@ public class ThreeScaleBroker {
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public synchronized BindingResult binding(@PathParam("instance_id") String instance_id, Binding binding) throws URISyntaxException {
+    public synchronized BindingResult binding(@HeaderParam("X-Broker-Api-Version") String version, @PathParam("instance_id") String instance_id, Binding binding) throws URISyntaxException {
+        if (null == version) {
+            logger.warning("binding, X-Broker-Api-Version is null!");
+        } else if (!X_BROKER_API_VERSION.equals(X_BROKER_API_VERSION)) {
+            logger.warning("binding, request header X-Broker-Api-Version is " + version + ", this broker might not work properly, because it is built based on API version " + X_BROKER_API_VERSION);
+        } else {
+            logger.info("binding, X-Broker-Api-Version: " + version);
+        }
+
         Persistence persistence = Persistence.getInstance();
         BindingResult result = new SecuredMarket().binding(binding);
         logger.info("binding.result : " + result);
@@ -207,8 +240,14 @@ public class ThreeScaleBroker {
     @DELETE
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
     @Produces({MediaType.APPLICATION_JSON})
-    public synchronized BindingResult unBinding(@PathParam("instance_id") String instanceId, @PathParam("binding_id") String bindingId) {
-
+    public synchronized BindingResult unBinding(@HeaderParam("X-Broker-Api-Version") String version, @PathParam("instance_id") String instanceId, @PathParam("binding_id") String bindingId) {
+        if (null == version) {
+            logger.warning("unBinding, X-Broker-Api-Version is null!");
+        } else if (!X_BROKER_API_VERSION.equals(X_BROKER_API_VERSION)) {
+            logger.warning("unBinding, request header X-Broker-Api-Version is " + version + ", this broker might not work properly, because it is built based on API version " + X_BROKER_API_VERSION);
+        } else {
+            logger.info("unBinding, X-Broker-Api-Version: " + version);
+        }
         Persistence persistence = Persistence.getInstance();
         persistence.deleteBindingInfo(instanceId);
         logger.info("unBinding finished, instance_id:" + instanceId + ", binding_id: " + bindingId);
@@ -223,12 +262,18 @@ public class ThreeScaleBroker {
     @PATCH
     @Path("/service_instances/{instance_id}")
     @Produces({MediaType.APPLICATION_JSON})
-    public synchronized UpdateResult updateServiceInstance(@PathParam("instance_id") String instanceId, UpdateObject updateObject) throws URISyntaxException{
-
+    public synchronized UpdateResult updateServiceInstance(@HeaderParam("X-Broker-Api-Version") String version, @PathParam("instance_id") String instanceId, UpdateObject updateObject) throws URISyntaxException {
+        if (null == version) {
+            logger.warning("updateServiceInstance, X-Broker-Api-Version is null!");
+        } else if (!X_BROKER_API_VERSION.equals(X_BROKER_API_VERSION)) {
+            logger.warning("updateServiceInstance, request header X-Broker-Api-Version is " + version + ", this broker might not work properly, because it is built based on API version " + X_BROKER_API_VERSION);
+        } else {
+            logger.info("updateServiceInstance, X-Broker-Api-Version: " + version);
+        }
         logger.info("updateServiceInstance, instance_id:" + instanceId);
         logger.info("updateServiceInstance, service_id:" + updateObject.getService_id());
         logger.info("updateServiceInstance, plan_id:" + updateObject.getPlan_id());
-        
+
         //Please note the persistency of the request is inside the updateServiceInstance
         //and the record is: 1) persist to the provision table 2) only persist when there is update.
         UpdateResult result = new SecuredMarket().updateServiceInstance(instanceId, updateObject);

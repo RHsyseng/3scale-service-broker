@@ -265,10 +265,9 @@ node {
                 echo "!!!!!!!!!!!!!!!!!!Error means there is an existing test.broker.com, no need to create, just continue for curl test..."
             }            
             sh "sleep 5"
-            //            def result = sh "curl http://test.broker.com/v2/catalog "
             
             def result = sh (
-                script: 'curl http://test.broker.com/v2/catalog',
+                script: 'curl -H \"X-Broker-API-Version: 2.13\" http://test.broker.com/v2/catalog',
                 returnStdout: true
             ).trim()    
             echo "curl result: ${result}"   
@@ -310,12 +309,12 @@ node {
             
         //do a deprovisioning first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
         //without deprovisioning first it might also failed because same service name exists at 3 scale side. 
-        sh "curl  -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/123?plan_id=secure-service-plan-id&service_id=secure-service-id\""
+        sh "curl -H \"X-Broker-API-Version: 2.13\" -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/123?plan_id=secure-service-plan-id&service_id=secure-service-id\""
       
         
         
         def result = sh (
-            script: "curl  -H \"Content-Type: application/json\" -X PUT -d '{\"context\":{\"platform\":\"ocp\",\"namespace\":\"some-namespace\"},\"service_id\":\"service-guid-here\",\"plan_id\":\"plan-guid-here\",\"organization_guid\":\"org-guid-here\",\"space_guid\":\"space-guid-here\",\"parameters\":{\"service_name\":\"testSecureService\",\"application_plan\":\"testSecureServicePlan\",\"input_url\":\"http://www.google.com\",\"application_name\":\"testSecureServiceApp\"}}'  http://test.broker.com/v2/service_instances/123",
+            script: "curl -H \"X-Broker-API-Version: 2.13\" -H \"Content-Type: application/json\" -X PUT -d '{\"context\":{\"platform\":\"ocp\",\"namespace\":\"some-namespace\"},\"service_id\":\"service-guid-here\",\"plan_id\":\"plan-guid-here\",\"organization_guid\":\"org-guid-here\",\"space_guid\":\"space-guid-here\",\"parameters\":{\"service_name\":\"testSecureService\",\"application_plan\":\"testSecureServicePlan\",\"input_url\":\"http://www.google.com\",\"application_name\":\"testSecureServiceApp\"}}'  http://test.broker.com/v2/service_instances/123",
             returnStdout: true
         ).trim()    
         echo "curl result: ${result}"   
@@ -338,10 +337,10 @@ node {
         //do a deprovisioning first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
         //without deprovisioning first it might also failed because same name exists at 3 scale side. 
         //test instance id: 5555
-        sh "curl  -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/5555?plan_id=secure-service-plan-id&service_id=secure-service-id\""
+        sh "curl  -H \"X-Broker-API-Version: 2.13\" -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/5555?plan_id=secure-service-plan-id&service_id=secure-service-id\""
         
         def result = sh (
-            script: "curl  -H \"Content-Type: application/json\" -X PUT -d '{\"context\":{\"platform\":\"ocp\",\"namespace\":\"some-namespace\"},\"service_id\":${serviceId},\"plan_id\":${planId},\"organization_guid\":\"org-guid-here\",\"space_guid\":\"space-guid-here\",\"parameters\":{\"applicationName\":\"testSecuredMarketApp\",\"description\":\"testSecuredMarketApp\"}}'  http://test.broker.com/v2/service_instances/5555",
+            script: "curl -H \"X-Broker-API-Version: 2.13\" -H \"Content-Type: application/json\" -X PUT -d '{\"context\":{\"platform\":\"ocp\",\"namespace\":\"some-namespace\"},\"service_id\":${serviceId},\"plan_id\":${planId},\"organization_guid\":\"org-guid-here\",\"space_guid\":\"space-guid-here\",\"parameters\":{\"applicationName\":\"testSecuredMarketApp\",\"description\":\"testSecuredMarketApp\"}}'  http://test.broker.com/v2/service_instances/5555",
             returnStdout: true
         ).trim()    
         echo "curl result: ${result}"   
@@ -361,10 +360,10 @@ node {
         println("---------------------------------- Test4: BindingForSecuredMarket  ----------------------------------")
             
         //do a unbinding first, otherwise the provision will be skipped if there is already same instance id in the sqlite DB
-        sh "curl  -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/8888/service_bindings/9999\""
+        sh "curl  -H \"X-Broker-API-Version: 2.13\" -H \"Content-Type: application/json\" -X DELETE  \"http://test.broker.com/v2/service_instances/8888/service_bindings/9999\""
         
         def result = sh (
-            script: "curl  -H \"Content-Type: application/json\" -X PUT -d '{\"service_id\":${serviceId},\"plan_id\":${planId},\"bind_resource\": {\"app_guid\": \"app-guid-here\"}}'  http://test.broker.com/v2/service_instances/8888/service_bindings/9999",
+            script: "curl -H \"X-Broker-API-Version: 2.13\" -H \"Content-Type: application/json\" -X PUT -d '{\"service_id\":${serviceId},\"plan_id\":${planId},\"bind_resource\": {\"app_guid\": \"app-guid-here\"}}'  http://test.broker.com/v2/service_instances/8888/service_bindings/9999",
             returnStdout: true
         ).trim()    
         echo "curl result: ${result}"   
@@ -387,7 +386,7 @@ node {
         //test3 uses planId (smallPizza plan), while this will use planId2 to update it to (largePizza plan)
         
         def result = sh (
-            script: "curl  -H \"Content-Type: application/json\" -X PATCH -d '{\"service_id\":${serviceId},\"plan_id\":${planId2},\"context\":{\"platform\":\"ocp\",\"namespace\":\"some-namespace\"}}'  http://test.broker.com/v2/service_instances/5555",
+            script: "curl -H \"X-Broker-API-Version: 2.13\" -H \"Content-Type: application/json\" -X PATCH -d '{\"service_id\":${serviceId},\"plan_id\":${planId2},\"context\":{\"platform\":\"ocp\",\"namespace\":\"some-namespace\"}}'  http://test.broker.com/v2/service_instances/5555",
             returnStdout: true
         ).trim()    
         echo "curl result: ${result}"   

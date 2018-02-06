@@ -243,7 +243,7 @@ node {
         //delete the old three-scale application first
         withEnv(["PATH+OC=${OC_HOME}"]) {
             sh "${OC_HOME}/oc delete ClusterServiceBroker 3scale-broker"
-            sh "sleep 20"
+            sh "sleep 40"
             sh "${OC_HOME}/oc get ClusterServiceBroker"
                     
             sh "${OC_HOME}/oc create -f 3scale-broker.yml"

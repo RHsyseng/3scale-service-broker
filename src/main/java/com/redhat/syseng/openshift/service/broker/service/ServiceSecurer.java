@@ -1,7 +1,6 @@
 package com.redhat.syseng.openshift.service.broker.service;
 
 import java.net.URISyntaxException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -9,7 +8,7 @@ import com.redhat.syseng.openshift.service.broker.model.amp.Application;
 import com.redhat.syseng.openshift.service.broker.model.amp.Plan;
 import com.redhat.syseng.openshift.service.broker.model.amp.Proxy;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
-import com.redhat.syseng.openshift.service.broker.model.provision.Result;
+import com.redhat.syseng.openshift.service.broker.model.provision.ProvisionResult;
 import com.redhat.syseng.openshift.service.broker.model.service.ServiceParameters;
 import com.redhat.syseng.openshift.service.broker.persistence.Persistence;
 import com.redhat.syseng.openshift.service.broker.persistence.PlatformConfig;
@@ -22,7 +21,7 @@ public class ServiceSecurer {
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    Result provisioningForSecureService(String instanceId, Provision provision) throws URISyntaxException //public String provisioning( String testString) {
+    ProvisionResult provisioningForSecureService(String instanceId, Provision provision) throws URISyntaxException //public String provisioning( String testString) {
     {
         Map<String, Object> inputParameters = provision.getParameters();
 
@@ -78,7 +77,7 @@ public class ServiceSecurer {
             url = "https://" + (String) inputParameters.get("service_name") + domain + "/?user_key=" + application.getUserKey();
         }
 
-        return new Result("task_10", url, newServiceId);
+        return new ProvisionResult(url, newServiceId);
     }
 
     public void deProvisioning(String instanceId) throws URISyntaxException {

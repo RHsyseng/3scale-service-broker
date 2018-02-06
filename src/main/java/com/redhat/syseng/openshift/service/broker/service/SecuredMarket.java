@@ -24,7 +24,7 @@ import com.redhat.syseng.openshift.service.broker.model.catalog.Service;
 import com.redhat.syseng.openshift.service.broker.model.catalog.ServiceBinding;
 import com.redhat.syseng.openshift.service.broker.model.catalog.ServiceInstance;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
-import com.redhat.syseng.openshift.service.broker.model.provision.Result;
+import com.redhat.syseng.openshift.service.broker.model.provision.ProvisionResult;
 import com.redhat.syseng.openshift.service.broker.model.service.ServiceParameters;
 import com.redhat.syseng.openshift.service.broker.model.update.UpdateObject;
 import com.redhat.syseng.openshift.service.broker.model.update.UpdateResult;
@@ -38,7 +38,7 @@ public class SecuredMarket {
 
     private Logger logger = Logger.getLogger(getClass().getName());
 
-    Result provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException {
+    ProvisionResult provision(@PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException {
         Map<String, Object> inputParameters = provision.getParameters();
 
         PlatformConfig platformConfig = Persistence.getInstance().getPlatformConfig();
@@ -64,7 +64,7 @@ public class SecuredMarket {
 
         String endpoint = BrokerUtil.searchEndPointBasedOnServiceId(provision.getService_id());
         String url = endpoint + "/?user_key=" + userKey;
-        Result result = new Result("task_10", url, null);
+        ProvisionResult result = new ProvisionResult(url, null);
         result.setAppliationId(applicationId);
         logger.info("provisioning result" + result);
         return result;

@@ -3,11 +3,24 @@ package com.redhat.syseng.openshift.service.broker.model.provision;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Result {
+public class ProvisionResult {
     private String serviceId;
     private String appliationId;
 
-    public String getAppliationId() {
+    //For asynchronous responses, service brokers MAY return an identifier representing the operation. 
+    //since for 3scale broker, it won't be async, so this field is not used for now.
+    private String operation;
+
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonProperty("dashboard_url")
+    private String dashboardUrl;
+
+    public ProvisionResult( String dashboardUrl, String serviceId) {
+        this.dashboardUrl = dashboardUrl;
+        this.serviceId = serviceId;
+    }
+
+     public String getAppliationId() {
         return appliationId;
     }
 
@@ -23,27 +36,6 @@ public class Result {
         this.serviceId = serviceId;
     }
     
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String operation;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonProperty("dashboard_url")
-    private String dashboardUrl;
-
-    public Result(String operation, String dashboardUrl, String serviceId) {
-        this.operation = operation;
-        this.dashboardUrl = dashboardUrl;
-        this.serviceId = serviceId;
-    }
-
-    public String getOperation() {
-        return operation;
-    }
-
-    public void setOperation(String operation) {
-        this.operation = operation;
-    }
-
     public String getDashboardUrl() {
         return dashboardUrl;
     }
@@ -54,7 +46,7 @@ public class Result {
 
     @Override
     public String toString() {
-        return "BindingResult{" +
+        return "ProvisionResult{" +
                 "operation='" + operation + '\'' +
                 ", dashboardUrl='" + dashboardUrl + '\'' +
                 '}';

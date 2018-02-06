@@ -25,7 +25,7 @@ import com.redhat.syseng.openshift.service.broker.model.binding.BindingResult;
 import com.redhat.syseng.openshift.service.broker.model.catalog.Catalog;
 import com.redhat.syseng.openshift.service.broker.model.catalog.Service;
 import com.redhat.syseng.openshift.service.broker.model.provision.Provision;
-import com.redhat.syseng.openshift.service.broker.model.provision.Result;
+import com.redhat.syseng.openshift.service.broker.model.provision.ProvisionResult;
 import com.redhat.syseng.openshift.service.broker.model.update.UpdateObject;
 import com.redhat.syseng.openshift.service.broker.model.update.UpdateResult;
 import com.redhat.syseng.openshift.service.broker.persistence.Persistence;
@@ -93,12 +93,12 @@ public class ThreeScaleBroker {
     @Path("/service_instances/{instance_id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public synchronized Result provision(@HeaderParam("X-Broker-Api-Version") String version, @HeaderParam("X-Broker-API-Originating-Identity") String originatingIdentity, @PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException {
+    public synchronized ProvisionResult provision(@HeaderParam("X-Broker-Api-Version") String version, @HeaderParam("X-Broker-API-Originating-Identity") String originatingIdentity, @PathParam("instance_id") String instance_id, Provision provision) throws URISyntaxException {
         handleHttpHeaderInfo("provision", version, originatingIdentity);
 
         logger.info("Provisioning " + instance_id + " with data " + provision);
         Persistence persistence = Persistence.getInstance();
-        Result result;
+        ProvisionResult result;
 
         //Add this check here because for one provision request, OCP spawns mulitple threads, added this "if else check" to make sure only the 1st one go through and recorded
         //otherwise it might cause primary key violation issue in database since the instance ID is PK. 
@@ -120,7 +120,7 @@ public class ThreeScaleBroker {
                 logger.info(configurationName + ": " + platformConfig);
 
                 //for setup AMP configuration provision, no backend, so just return an dummy result to indicate it finished.
-                result = new Result("task_10", null, null);
+                result = new ProvisionResult(null, null);
                 persistence.setConfiguration(instance_id, configurationName, platformConfig);
 
             } else {
@@ -136,7 +136,7 @@ public class ThreeScaleBroker {
 
         } else {
             logger.info("ProvisionInfo already exists, skip provision again");
-            result = new Result("task_10", null, null);
+            result = new ProvisionResult(null, null);
         }
 
         return result;
@@ -145,7 +145,7 @@ public class ThreeScaleBroker {
     @DELETE
     @Path("/service_instances/{instance_id}")
     @Produces({MediaType.APPLICATION_JSON})
-    public synchronized Result deProvisioning(@HeaderParam("X-Broker-Api-Version") String version, @HeaderParam("X-Broker-API-Originating-Identity") String originatingIdentity, @PathParam("instance_id") String instanceId, @QueryParam("service_id") String serviceId, @QueryParam("plan_id") String planId) throws URISyntaxException {
+    public synchronized ProvisionResult deProvisioning(@HeaderParam("X-Broker-Api-Version") String version, @HeaderParam("X-Broker-API-Originating-Identity") String originatingIdentity, @PathParam("instance_id") String instanceId, @QueryParam("service_id") String serviceId, @QueryParam("plan_id") String planId) throws URISyntaxException {
         handleHttpHeaderInfo("deProvisioning", version, originatingIdentity);
 
         logger.info("deProvisioning instance_id: " + instanceId);
@@ -171,7 +171,7 @@ public class ThreeScaleBroker {
         persistence.deleteProvisionInfo(instanceId);
         logger.info("Provisioning is deleted from persistence, deProvisioning finished ");
 
-        return new Result(null, null, null);
+        return new ProvisionResult(null, null);
 
     }
 

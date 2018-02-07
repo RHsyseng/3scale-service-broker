@@ -218,7 +218,7 @@ public class SecuredMarket {
                     ServiceParameters sp = new ServiceParameters();
                     sp.setPlan_id(updateObject.getPlan_id());
                     getThreeScaleApiService().changeApplicationPlan(persistence.getPlatformConfig().getAccountId(), applicationId, sp);
-                    result.setStatus("success");
+                    result.setDescription("success");
                     
                     String oldPlanString = "plan_id='" + existingPlanId + "'";
                     String newPlanString = "plan_id='" + updateObject.getPlan_id() + "'";
@@ -230,13 +230,13 @@ public class SecuredMarket {
             } else {
                 String status = "no need to update, plan id is the same: " + existingPlanId;
                 logger.info(status);
-                result.setStatus(status);
+                result.setDescription(status);
             }
 
         } else {
                 String status = "no need to update, couldn't find existing instance with same instance id: " + instanceId;
                 logger.info(status);
-                result.setStatus(status);
+                result.setDescription(status);
         }
         
         

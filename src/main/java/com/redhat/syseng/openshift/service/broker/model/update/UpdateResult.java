@@ -2,20 +2,22 @@ package com.redhat.syseng.openshift.service.broker.model.update;
 
 public class UpdateResult {
 
-    private String status;
+    private String description;
 
-    public String getStatus() {
-        return status;
+
+    public String getDescription() {
+        return description;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setDescription(String description) {
+        this.description = description;
     }
+
 
     @Override
     public String toString() {
         return "UpdateResult {"
-                + "status='" + status + '\''
+                + "description='" + description + '\''
                 + '}';
     }
 }

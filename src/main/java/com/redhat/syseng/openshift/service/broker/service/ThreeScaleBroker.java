@@ -103,6 +103,10 @@ public class ThreeScaleBroker {
         //Add this check here because for one provision request, OCP spawns mulitple threads, added this "if else check" to make sure only the 1st one go through and recorded
         //otherwise it might cause primary key violation issue in database since the instance ID is PK. 
         if (!persistence.isProvisionInfoExist(instance_id)) {
+            
+            logger.info("persistence.persistProvisionInfo with request_success == 0");
+
+            persistence.persistProvisionInfo(instance_id, provision);
             if (provision.getParameters().containsKey("input_url")) {
                 //This is the provision for SecureService 
                 result = new ServiceSecurer().provisioningForSecureService(instance_id, provision);
@@ -129,8 +133,12 @@ public class ThreeScaleBroker {
                 Map<String, Object> parameters = provision.getParameters();
                 parameters.put("applicationId", result.getAppliationId());
             }
-            persistence.persistProvisionInfo(instance_id, provision);
-            //logger.info("persist provision : " + persistence.retrieveProvisionInfo(instance_id).toString());
+
+            // For specification Orphans requirement, first we persist the provisionInfo in DB with request_success == 0 (means false)
+            // Then when the request comes back from 3scale successfully, the same record will be updated with request_success == 1
+            // Thus any record's request_success remains 0 means an orphoan might be exist at 3scale AMP side, need special treatment.
+            persistence.updateProvisionRecordWithSuccessFlag(instance_id);
+            logger.info("persistence.updateProvisionRecordWithSuccessFlag == 1");
 
             logger.info("provision.result: " + result);
 
@@ -186,6 +194,10 @@ public class ThreeScaleBroker {
      * read-only, it can be executed multiple times 4) So let it run, only limit
      * the persist binding info for the 1st request to avoid DB exception in the
      * log.
+     *
+     * For specification Orphans requirement, since binding in 3scale AMP doesn't
+     * really create anything, it just return existing URL and user_key, so no
+     * need to handle orphans for bindings.
      */
     @PUT
     @Path("/service_instances/{instance_id}/service_bindings/{binding_id}")
@@ -207,7 +219,7 @@ public class ThreeScaleBroker {
     }
 
     /**
-     * Since for configureAMP and serviceSecure there are no binding and for
+     * Since for configureAMP and serviceSecure there are no binding, and for
      * securedMarket binding, it doesn't really create anything in 3scale AMP,
      * just return URL and user_key, so nothing need to be deleted for unbinding
      * at 3scale side, just delete the binding info from persistence.

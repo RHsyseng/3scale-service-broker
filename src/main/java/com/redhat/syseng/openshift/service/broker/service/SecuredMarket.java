@@ -223,6 +223,7 @@ public class SecuredMarket {
                     String oldPlanString = "plan_id='" + existingPlanId + "'";
                     String newPlanString = "plan_id='" + updateObject.getPlan_id() + "'";
                     String newProvisionInfo = provisionInfo.replace(oldPlanString, newPlanString);
+                    //update the provisioninfo in DB for the new plan id
                     persistence.updateProvisionInfo(instanceId, newProvisionInfo);
                     logger.info("SecuredMarket.updateServiceInstance(), updated old plan in 3scale AMP and persistence");
                 }

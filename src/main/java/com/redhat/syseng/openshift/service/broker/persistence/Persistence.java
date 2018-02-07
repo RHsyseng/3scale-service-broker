@@ -103,7 +103,7 @@ public class Persistence {
 
             //create three tables needed.
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS CONFIGURATION_TABLE (instance_id TEXT PRIMARY KEY, configuration_name TEXT,  admin_address TEXT, access_token TEXT, account_id TEXT, use_ocp_certification TEXT);");
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PROVISION_TABLE (instance_id TEXT PRIMARY KEY,  provision_info TEXT);");
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PROVISION_TABLE (instance_id TEXT PRIMARY KEY,  provision_info TEXT, request_success Text);");
             stmt.executeUpdate("CREATE TABLE IF NOT EXISTS BINDING_TABLE (instance_id TEXT PRIMARY KEY,  binding_info TEXT);");
             logger.info("created all needed tables successfully");
         } catch (ClassNotFoundException | SQLException e) {
@@ -186,8 +186,8 @@ public class Persistence {
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
-            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PROVISION_TABLE (instance_id TEXT PRIMARY KEY,  provision_info TEXT);");
-            String sqlString = "insert into PROVISION_TABLE values(\"" + instanceId + "\",\"" + provision.toString() + "\");";
+            stmt.executeUpdate("CREATE TABLE IF NOT EXISTS PROVISION_TABLE (instance_id TEXT PRIMARY KEY,  provision_info TEXT, request_success Text);");
+            String sqlString = "insert into PROVISION_TABLE values(\"" + instanceId + "\",\"" + provision.toString() + "\",\"0\"  );";
             logger.info("insert string: " + sqlString);
             stmt.executeUpdate(sqlString);
             //connection.commit();
@@ -224,10 +224,36 @@ public class Persistence {
             logger.info(e.getClass().getName() + ": " + e.getMessage());
             throw new IllegalStateException(e);
         }
-        logger.info("persistProvisionInfo: instanceId" + instanceId + " provision: " + provision.toString());
-
+        logger.info("updateProvisionInfo: instanceId" + instanceId + " provision: " + provision.toString());
     }    
 
+    public void updateProvisionRecordWithSuccessFlag(String instanceId) {
+
+        Connection connection = null;
+        Statement stmt = null;
+        try {
+            Class.forName("org.sqlite.JDBC");
+            connection = DriverManager.getConnection(SQLITE_DB_URL);
+            //connection.setAutoCommit(false);
+            //logger.info("persistProvisionInfo Opened database successfully");
+
+            stmt = connection.createStatement();
+            stmt.setQueryTimeout(30);  // set timeout to 30 sec.
+
+            String sqlString = "update PROVISION_TABLE set request_success =\"1\" where instance_id =\""+ instanceId + "\";";
+            logger.info("update string: " + sqlString);
+            stmt.executeUpdate(sqlString);
+            //connection.commit();
+            stmt.close();
+            connection.close();
+        } catch (ClassNotFoundException | SQLException e) {
+            logger.info(e.getClass().getName() + ": " + e.getMessage());
+            throw new IllegalStateException(e);
+        }
+        logger.info("updateProvisionRecordWithSuccessFlag: instanceId" + instanceId);
+    }    
+
+    
     public void deleteProvisionInfo(String instanceId) {
 
         Connection connection = null;

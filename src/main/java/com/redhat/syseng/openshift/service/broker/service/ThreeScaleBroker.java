@@ -133,11 +133,11 @@ public class ThreeScaleBroker {
                 Map<String, Object> parameters = provision.getParameters();
                 parameters.put("applicationId", result.getAppliationId());
             }
-
+            
             // For specification Orphans requirement, first we persist the provisionInfo in DB with request_success == 0 (means false)
             // Then when the request comes back from 3scale successfully, the same record will be updated with request_success == 1
             // Thus any record's request_success remains 0 means an orphoan might be exist at 3scale AMP side, need special treatment.
-            persistence.updateProvisionRecordWithSuccessFlag(instance_id);
+            persistence.updateProvisionInfoWithSuccessFlag(instance_id, provision);
             logger.info("persistence.updateProvisionRecordWithSuccessFlag == 1");
 
             logger.info("provision.result: " + result);

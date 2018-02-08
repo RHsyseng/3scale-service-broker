@@ -240,7 +240,7 @@ public class Persistence {
             stmt = connection.createStatement();
             stmt.setQueryTimeout(30);  // set timeout to 30 sec.
 
-            String sqlString = "update PROVISION_TABLE set request_success =\"1\", set provision_info =\"" + provision.toString() + "\" where instance_id =\""+ instanceId + "\";";
+            String sqlString = "update PROVISION_TABLE set request_success =\"1\", provision_info =\"" + provision.toString() + "\" where instance_id =\""+ instanceId + "\";";
             logger.info("update string: " + sqlString);
             stmt.executeUpdate(sqlString);
             //connection.commit();

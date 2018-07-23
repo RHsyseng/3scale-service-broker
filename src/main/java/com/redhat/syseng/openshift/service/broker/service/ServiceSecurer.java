@@ -57,7 +57,13 @@ public class ServiceSecurer {
             //API integration
             sp = new ServiceParameters();
             sp.setService_id(serviceId);
-            sp.setApi_backend((String) inputParameters.get("input_url"));
+            String inputUrl = (String) inputParameters.get("input_url");
+            //if the last character is "/", need to take it out. Otherwise 3scale API won't recongize it and return "HTTP 422 Unprocessable Entity"
+            if (null != inputUrl && inputUrl.length() > 0 && inputUrl.charAt(inputUrl.length() - 1) == '/') {
+                    inputUrl = inputUrl.substring(0, inputUrl.length() - 1);
+            }            
+            
+            sp.setApi_backend(inputUrl);
             Proxy proxy = getThreeScaleApiService().updateProxy(serviceId, sp);
             logger.info("---------------------integration result endPoint : " + proxy.getEndpoint());
 
